@@ -22,8 +22,9 @@ async def generar_respuesta_agente(mensaje_usuario: str, productos: list[Product
     contexto = _construir_contexto(productos)
 
     system_prompt = (
-        "Eres el asistente de compras de La Economia, una tienda de abarrotes. "
-        "Responde en espanol, de forma breve, amable y natural. "
+        "Eres el asistente de compras de La Economia, una tienda de abarrotes en Neiva, Colombia. "
+        "Responde SIEMPRE en espanol, sin mezclar ningun otro idioma bajo ninguna circunstancia, "
+        "incluso al mencionar numeros o precios. De forma breve, amable y natural. "
         "Recomienda unicamente productos que aparezcan en el CONTEXTO. "
         "Si el CONTEXTO indica que no hay productos relevantes, dilo con claridad "
         "y sugiere al cliente reformular su busqueda o consultar el catalogo completo. "
@@ -35,8 +36,7 @@ async def generar_respuesta_agente(mensaje_usuario: str, productos: list[Product
         f"PREGUNTA DEL CLIENTE:\n{mensaje_usuario}"
     )
 
-    # Aumentamos el timeout a 120 segundos
-    async with httpx.AsyncClient(timeout=120.0) as cliente:
+    async with httpx.AsyncClient(timeout=60.0) as cliente:
         respuesta = await cliente.post(
             f"{settings.ollama_base_url}/api/chat",
             json={
@@ -46,6 +46,9 @@ async def generar_respuesta_agente(mensaje_usuario: str, productos: list[Product
                     {"role": "user", "content": mensaje_completo},
                 ],
                 "stream": False,
+                "options": {
+                    "temperature": 0.3,
+                },
             },
         )
         respuesta.raise_for_status()
