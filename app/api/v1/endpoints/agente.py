@@ -1,36 +1,37 @@
 ﻿from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-# Reemplaza 'app.db' o 'app.database' con la ruta real descubierta en el Paso 1
-# Ejemplo: from app.core.database import get_db
+from app.core.config import settings
 from app.core.database import get_db
-
-from app.schemas.agente import ChatAgenteRequest, ChatAgenteResponse
+from app.schemas.agente import AgenteChatRequest, AgenteChatResponse
+from app.services.embeddings import get_embedding
 from app.services.agente import generar_respuesta_agente
-from app.services.busqueda import buscar_productos_similares
+from app.api.v1.endpoints.busqueda import _buscar_candidatos, _aplicar_filtro_hibrido
 
 router = APIRouter()
 
 
-@router.post("/chat", response_model=ChatAgenteResponse)
+@router.post(
+    "/chat",
+    response_model=AgenteChatResponse,
+    summary="Agente conversacional RAG: retriever semantico + filtro hibrido + generacion LLM",
+)
 async def agente_chat(
-    payload: ChatAgenteRequest,
-    db: AsyncSession = Depends(get_db),
-):
-    resultados = await buscar_productos_similares(
-        db=db,
-        consulta=payload.mensaje,
-        limite=5,
-        umbral_similitud=None,
-    )
+    payload: AgenteChatRequest, db: AsyncSession = Depends(get_db)
+) -> AgenteChatResponse:
+    vector_consulta = await get_embedding(payload.mensaje)
+
+    candidatos = await _buscar_candidatos(db, vector_consulta, k=8)
+    resultados = await _aplicar_filtro_hibrido(db, candidatos, payload.sede_id)
 
     resultados_relevantes = [
-        prod for prod in resultados if prod.similitud >= 0.4
+        r for r in resultados if r.similitud >= settings.umbral_similitud_minima
     ]
 
     respuesta_texto = await generar_respuesta_agente(payload.mensaje, resultados_relevantes)
 
-    return ChatAgenteResponse(
+    return AgenteChatResponse(
+        mensaje=payload.mensaje,
         respuesta=respuesta_texto,
         productos_recomendados=resultados_relevantes,
         hubo_resultados_relevantes=len(resultados_relevantes) > 0,
