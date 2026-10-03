@@ -1,0 +1,24 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# Docker & Logs
+*.log
+docker-compose.override.yml
+
+# Entorno y Secretos (CRITICO)
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# IDEs & System
+.vscode/
+.idea/
+*.swp
+.DS_Store
