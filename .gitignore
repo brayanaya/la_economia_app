@@ -22,3 +22,6 @@ docker-compose.override.yml
 .idea/
 *.swp
 .DS_Store
+
+# Archivos temporales de pruebas
+body.json
