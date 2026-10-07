@@ -1,30 +1,74 @@
-﻿import { ShoppingCart } from 'lucide-react';
+"use client";
 
-export default function Navbar() {
+import { useState } from "react";
+
+type Props = {
+  cartCount?: number;
+  onCartClick?: () => void;
+  onAccountClick?: () => void;
+  onSedeChange?: (sede: string) => void;
+};
+
+const SEDES = ["Santa Isabel", "Machines"];
+
+export default function Navbar({ cartCount = 0, onCartClick, onAccountClick, onSedeChange }: Props) {
+  const [sede, setSede] = useState(SEDES[0]);
+
   return (
-    <header className='bg-brand-red text-white border-b-4 border-brand-yellow'>
-      <div className='max-w-6xl mx-auto px-6 py-3 flex items-center justify-between'>
-        <div className='flex items-center gap-3'>
-          <div className='w-10 h-10 rounded-xl bg-white text-brand-red font-black flex items-center justify-center text-lg shadow'>
-            LE
+    <header className="w-full">
+      <div className="bg-brand-dark text-white text-xs">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2">
+          <div className="flex items-center gap-2">
+            <span className="text-brand-yellow">📍 Sede:</span>
+            <select
+              value={sede}
+              onChange={(e) => {
+                setSede(e.target.value);
+                onSedeChange?.(e.target.value);
+              }}
+              className="rounded bg-brand-dark px-2 py-1 text-white outline-none ring-1 ring-white/30 focus:ring-brand-yellow"
+            >
+              {SEDES.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
           </div>
-          <div>
-            <span className='font-extrabold text-xl tracking-tight block leading-none'>LA ECONOMIA</span>
-            <span className='text-[10px] text-brand-yellow font-semibold tracking-wider uppercase'>Supermercado Inteligente</span>
+          <div className="hidden gap-4 sm:flex">
+            <span>🚚 Envío rápido en Neiva</span>
+            <span className="text-brand-yellow">⚡ Domicilios el mismo día</span>
           </div>
         </div>
+      </div>
 
-        <nav className='hidden md:flex items-center gap-6 text-sm font-medium'>
-          <a href='#' className='hover:text-brand-yellow transition-colors'>Catalogo</a>
-          <a href='#' className='hover:text-brand-yellow transition-colors'>Ofertas</a>
-          <a href='#' className='hover:text-brand-yellow transition-colors'>Mis pedidos</a>
-        </nav>
+      <div className="border-b-4 border-brand-yellow bg-brand-red">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3">
+          <a href="/" className="flex items-center gap-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="La Economía Aya" className="h-12 w-auto" />
+            <span className="hidden text-lg font-extrabold text-white md:block">
+              La Economía <span className="text-brand-yellow">Aya</span>
+            </span>
+          </a>
 
-        <button className='bg-brand-yellow hover:bg-brand-yellow-dark text-brand-dark font-bold text-sm px-4 py-2 rounded-xl flex items-center gap-2 shadow-sm transition-transform active:scale-95'>
-          <ShoppingCart size={18} />
-          <span>Carrito</span>
-          <span className='bg-brand-red text-white text-xs px-2 py-0.5 rounded-full ml-1'>0</span>
-        </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onAccountClick}
+              className="rounded-full bg-white px-4 py-2 text-sm font-bold text-brand-red transition hover:bg-brand-yellow hover:text-brand-dark"
+            >
+              👤 Mi Cuenta
+            </button>
+            <button
+              onClick={onCartClick}
+              className="relative rounded-full bg-brand-yellow px-4 py-2 text-sm font-bold text-brand-dark transition hover:bg-brand-yellow-dark"
+              aria-label="Carrito"
+            >
+              🛒 Carrito
+              <span className="absolute -right-2 -top-2 flex h-6 min-w-6 items-center justify-center rounded-full bg-brand-dark px-1 text-xs font-bold text-white">
+                {cartCount}
+              </span>
+            </button>
+          </div>
+        </div>
       </div>
     </header>
   );

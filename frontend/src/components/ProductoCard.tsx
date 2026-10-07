@@ -1,48 +1,54 @@
-﻿import { ProductoRecuperado } from '@/lib/api';
+type Props = {
+  nombre: string;
+  precio: number;
+  imagen?: string;
+  sede: string;
+  stock: number;
+  /** Similitud pgvector, 0 a 1. Solo en resultados RAG. */
+  similitud?: number;
+  onAgregar?: () => void;
+};
 
-function formatearCOP(valor: number) {
-  return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(valor);
-}
+const cop = new Intl.NumberFormat("es-CO", {
+  style: "currency",
+  currency: "COP",
+  maximumFractionDigits: 0,
+});
 
-export default function ProductoCard({ producto }: { producto: ProductoRecuperado }) {
-  const sinStock = producto.stock_sede !== null && producto.stock_sede <= 0;
+export default function ProductoCard({ nombre, precio, imagen, sede, stock, similitud, onAgregar }: Props) {
+  const disponible = stock > 0;
 
   return (
-    <div className='bg-white border border-gray-200 rounded-2xl p-5 flex flex-col gap-3 shadow-sm hover:shadow-md transition-shadow'>
-      <div className='flex items-start justify-between'>
-        <div className='w-12 h-12 rounded-xl bg-red-50 text-brand-red font-black text-lg flex items-center justify-center border border-red-100'>
-          {producto.nombre.charAt(0)}
-        </div>
-        {sinStock ? (
-          <span className='bg-red-100 text-red-700 text-[11px] font-bold px-3 py-1 rounded-full'>Agotado</span>
+    <article className="relative flex flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md">
+      {similitud !== undefined && (
+        <span className="absolute left-3 top-3 z-10 rounded-full bg-brand-yellow px-2 py-1 text-[11px] font-bold text-brand-dark">
+          🎯 {Math.round(similitud * 100)}% coincidencia
+        </span>
+      )}
+
+      <div className="mb-3 flex h-40 items-center justify-center overflow-hidden rounded-lg bg-brand-bg">
+        {imagen ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={imagen} alt={nombre} className="h-full w-full object-contain" />
         ) : (
-          <span className='bg-emerald-100 text-emerald-800 text-[11px] font-bold px-3 py-1 rounded-full'>En stock</span>
+          <span className="text-4xl">🛒</span>
         )}
       </div>
 
-      <div>
-        <span className='text-[11px] text-gray-400 uppercase tracking-wider font-semibold'>
-          {producto.categoria_nombre || 'Abarrotes'}
-        </span>
-        <h3 className='font-bold text-gray-900 text-base leading-snug mt-0.5'>{producto.nombre}</h3>
-      </div>
+      <h3 className="line-clamp-2 min-h-10 text-sm font-semibold text-brand-dark">{nombre}</h3>
+      <p className="mt-2 text-xl font-extrabold text-brand-red">{cop.format(precio)}</p>
 
-      <div className='text-[11px] bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md w-max font-medium'>
-        Similitud RAG: {(producto.similitud * 100).toFixed(1)}%
-      </div>
+      <p className={`mt-1 text-xs font-medium ${disponible ? "text-brand-green" : "text-brand-red"}`}>
+        {disponible ? `● ${stock} disponibles en ${sede}` : `● Agotado en ${sede}`}
+      </p>
 
-      <div className='flex items-center justify-between mt-auto pt-3 border-t border-gray-100'>
-        <div>
-          <span className='text-xs text-gray-400 block leading-none'>Precio</span>
-          <span className='text-xl font-extrabold text-brand-red'>{formatearCOP(producto.precio)}</span>
-        </div>
-        <button
-          disabled={sinStock}
-          className='px-4 py-2.5 rounded-xl bg-brand-green hover:bg-brand-green-dark disabled:bg-gray-200 disabled:text-gray-400 text-white text-xs font-bold shadow-sm transition-transform active:scale-95'
-        >
-          Agregar
-        </button>
-      </div>
-    </div>
+      <button
+        onClick={onAgregar}
+        disabled={!disponible}
+        className="mt-3 w-full rounded-lg bg-brand-green py-2 text-sm font-bold text-white transition hover:bg-brand-green-dark disabled:cursor-not-allowed disabled:bg-gray-300"
+      >
+        Agregar al carrito
+      </button>
+    </article>
   );
 }

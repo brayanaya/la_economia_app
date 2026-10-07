@@ -1,32 +1,23 @@
-﻿export default function FooterCompliance() {
+export default function FooterCompliance() {
   return (
-    <footer className='bg-brand-dark text-gray-300 px-6 py-8 mt-12'>
-      <div className='max-w-6xl mx-auto flex flex-col gap-4 text-xs'>
-        <div className='flex flex-col sm:flex-row justify-between gap-4'>
-          <div>
-            <p className='text-white font-semibold text-sm mb-1'>Supermercado La Economia Aya</p>
-            <p>NIT 900.XXX.XXX-X - Neiva, Huila, Colombia</p>
-            <p>Sedes: Santa Isabel y Machines</p>
-          </div>
-          <div className='flex gap-6'>
-            <a href='/terminos' className='hover:text-brand-yellow'>Terminos y condiciones</a>
-            <a href='/politica-datos' className='hover:text-brand-yellow'>Tratamiento de datos personales</a>
-          </div>
+    <footer className="mt-12 bg-brand-dark text-gray-300">
+      <div className="mx-auto max-w-7xl space-y-4 px-4 py-8 text-sm">
+        <div>
+          <p className="font-bold text-brand-yellow">Supermercado y Distribuciones La Economía Aya</p>
+          <p>Neiva, Huila - Colombia</p>
+          {/* TODO: reemplazar por el NIT real antes de publicar */}
+          <p>NIT: [PENDIENTE - completar con el NIT real]</p>
         </div>
 
-        <div className='border-t border-gray-700 pt-4'>
-          <p>
-            Las recomendaciones de productos mostradas por el asistente virtual son generadas mediante
-            inteligencia artificial a partir del catalogo disponible y pueden contener imprecisiones.
-            Verifica siempre precio y disponibilidad antes de confirmar tu pedido.
-          </p>
-          <p className='mt-2'>
-            El tratamiento de tus datos personales se realiza conforme a la Ley 1581 de 2012 (Habeas Data)
-            de Colombia. Para conocer tus derechos y como ejercerlos, consulta nuestra politica de tratamiento de datos.
-          </p>
-        </div>
+        <p className="rounded-lg border border-white/10 p-3 text-xs">
+          🤖 <strong>Aviso de transparencia:</strong> las recomendaciones del asistente son generadas por
+          inteligencia artificial y pueden contener errores. Verifica precio y disponibilidad antes de comprar.
+        </p>
 
-        <p className='text-gray-500'>&copy; {new Date().getFullYear()} La Economia Aya. Todos los derechos reservados.</p>
+        <p className="text-xs text-gray-400">
+          Tratamiento de datos personales conforme a la Ley 1581 de 2012 (Habeas Data). ©{" "}
+          {new Date().getFullYear()} La Economía Aya. Todos los derechos reservados.
+        </p>
       </div>
     </footer>
   );
