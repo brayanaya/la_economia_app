@@ -1,3 +1,6 @@
+import re
+import unicodedata
+
 import httpx
 
 from app.core.config import settings
@@ -18,7 +21,34 @@ def _construir_contexto(productos: list[ProductoRecuperado]) -> str:
     return "\n".join(lineas)
 
 
+_SALUDOS = {
+    "hola", "holi", "buenas", "buenos dias", "buen dia", "buenas tardes",
+    "buenas noches", "hey", "saludos", "que tal", "hola buenas",
+    "hola buenos dias", "hola buenas tardes", "hola buenas noches", "hola como estas",
+}
+
+
+def _normalizar(texto: str) -> str:
+    sin_tildes = "".join(
+        c for c in unicodedata.normalize("NFD", texto.lower())
+        if unicodedata.category(c) != "Mn"
+    )
+    return re.sub(r"[^a-z0-9 ]", "", sin_tildes).strip()
+
+
+def _respuesta_sin_productos(mensaje: str) -> str:
+    """Sin productos recuperados no se consulta al LLM: un modelo de 7B inventa catalogo."""
+    if _normalizar(mensaje) in _SALUDOS:
+        return "\u00a1Hola! Soy el asistente de compras de La Econom\u00eda. \u00bfQu\u00e9 producto est\u00e1s buscando?"
+    return (
+        "No encontr\u00e9 productos en el cat\u00e1logo que coincidan con tu b\u00fasqueda. "
+        "Puedes reformularla o preguntarme por otro producto."
+    )
+
+
 async def generar_respuesta_agente(mensaje_usuario: str, productos: list[ProductoRecuperado]) -> str:
+    if not productos:
+        return _respuesta_sin_productos(mensaje_usuario)
     contexto = _construir_contexto(productos)
 
     system_prompt = (
