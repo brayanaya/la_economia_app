@@ -1,4 +1,4 @@
-﻿import httpx
+import httpx
 
 from app.core.config import settings
 from app.schemas.busqueda import ProductoRecuperado
@@ -6,7 +6,7 @@ from app.schemas.busqueda import ProductoRecuperado
 
 def _construir_contexto(productos: list[ProductoRecuperado]) -> str:
     if not productos:
-        return "No se encontraron productos relevantes en el catalogo para esta consulta."
+        return "No se encontraron productos relevantes en el catalogo para esta consulta. No conoces el inventario actual: NO menciones ningun producto, categoria ni marca concretos."
 
     lineas = []
     for p in productos:
@@ -28,7 +28,9 @@ async def generar_respuesta_agente(mensaje_usuario: str, productos: list[Product
         "Recomienda unicamente productos que aparezcan en el CONTEXTO. "
         "Si el CONTEXTO indica que no hay productos relevantes, dilo con claridad "
         "y sugiere al cliente reformular su busqueda o consultar el catalogo completo. "
-        "Nunca inventes productos, precios o existencias que no esten en el CONTEXTO."
+        "Nunca inventes productos, precios o existencias que no esten en el CONTEXTO. "
+        "Solo ayudas con compras de la tienda: si la pregunta es de otro tema, dilo con amabilidad y no ofrezcas ayuda con ese tema. "
+        "Si el cliente solo saluda, saluda y preguntale que producto busca."
     )
 
     mensaje_completo = (
