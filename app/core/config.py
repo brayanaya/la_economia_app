@@ -1,4 +1,4 @@
-﻿from urllib.parse import quote_plus
+from urllib.parse import quote_plus
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     llm_model: str = "qwen2.5:7b"
     umbral_similitud_minima: float = 0.5
     ollama_base_url: str = "http://host.docker.internal:11434"
+    ollama_embedding_model: str = "nomic-embed-text"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
