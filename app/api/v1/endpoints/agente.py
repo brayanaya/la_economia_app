@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
@@ -24,9 +24,11 @@ async def agente_chat(
     candidatos = await _buscar_candidatos(db, vector_consulta, k=8)
     resultados = await _aplicar_filtro_hibrido(db, candidatos, payload.sede_id)
 
-    resultados_relevantes = [
-        r for r in resultados if r.similitud >= settings.umbral_similitud_minima
-    ]
+    # Piso configurable + margen relativo al mejor resultado: nomic-embed-text
+    # puntua ~0.40-0.50 incluso productos no relacionados.
+    mejor = max((r.similitud for r in resultados), default=0.0)
+    umbral = max(settings.umbral_similitud_minima, mejor - 0.10)
+    resultados_relevantes = [r for r in resultados if r.similitud >= umbral][:4]
 
     respuesta_texto = await generar_respuesta_agente(payload.mensaje, resultados_relevantes)
 
