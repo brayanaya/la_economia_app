@@ -69,7 +69,7 @@ async function post(path: string, body: unknown): Promise<unknown> {
 }
 
 export async function buscarSemantica(consulta: string, sedeId: number | null, topK = 8): Promise<Producto[]> {
-  const data = await post("/busqueda/semantica", { consulta, sede_id: sedeId, top_k: topK });
+  const data = await post("/busqueda/busqueda/semantica", { consulta, sede_id: sedeId, top_k: topK });
   return extraerLista(data).map(normalizarProducto);
 }
 
