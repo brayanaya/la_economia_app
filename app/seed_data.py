@@ -1,4 +1,4 @@
-﻿import asyncio
+import asyncio
 
 from sqlalchemy import select
 
@@ -96,7 +96,7 @@ async def ejecutar_seed():
             texto_contenido = (
                 f"{p_data['nombre']}. {p_data['descripcion']}. Categoria: {p_data['categoria']}."
             )
-            vector = await get_embedding(texto_contenido)
+            vector = await get_embedding(texto_contenido, tipo="document")
 
             session.add(
                 EmbeddingProducto(

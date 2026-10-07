@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import asyncio
 import functools
-from typing import Protocol
+from typing import Literal, Protocol
 
 import httpx
 
@@ -150,10 +150,22 @@ def get_embedding_provider() -> EmbeddingProvider:
     )
 
 
-async def get_embedding(texto: str) -> list[float]:
+def _aplicar_prefijo(texto: str, tipo: str) -> str:
+    """Nomic Embed necesita prefijos de tarea distintos para consulta y documento."""
+    if settings.embedding_provider != "ollama":
+        return texto
+    if not settings.ollama_embedding_model.startswith("nomic-embed-text"):
+        return texto
+    prefijo = "search_query: " if tipo == "query" else "search_document: "
+    return texto if texto.startswith(prefijo) else prefijo + texto
+
+
+async def get_embedding(
+    texto: str, tipo: Literal["query", "document"] = "query"
+) -> list[float]:
     """Punto de entrada único usado por los endpoints y por el retriever."""
     provider = get_embedding_provider()
-    return await provider.embed(texto)
+    return await provider.embed(_aplicar_prefijo(texto, tipo))
 
 
 def construir_contenido_fuente(

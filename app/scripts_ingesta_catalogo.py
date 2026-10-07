@@ -41,7 +41,7 @@ async def ingestar_catalogo() -> None:
                 descripcion=producto.descripcion,
             )
 
-            vector = await get_embedding(contenido)
+            vector = await get_embedding(contenido, tipo="document")
 
             # Reemplaza cualquier embedding previo del mismo producto
             # (reindexación incremental ante alta/modificación, RF-09).
