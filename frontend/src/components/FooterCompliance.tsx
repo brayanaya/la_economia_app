@@ -1,3 +1,5 @@
+const ANIO = 2026;
+
 export default function FooterCompliance() {
   return (
     <footer className="mt-12 bg-brand-dark text-gray-300">
@@ -15,8 +17,8 @@ export default function FooterCompliance() {
         </p>
 
         <p className="text-xs text-gray-400">
-          Tratamiento de datos personales conforme a la Ley 1581 de 2012 (Habeas Data). ©{" "}
-          {new Date().getFullYear()} La Economía Aya. Todos los derechos reservados.
+          Tratamiento de datos personales conforme a la Ley 1581 de 2012 (Habeas Data). © {ANIO} La Economía
+          Aya. Todos los derechos reservados.
         </p>
       </div>
     </footer>
