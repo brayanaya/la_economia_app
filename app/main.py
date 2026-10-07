@@ -13,6 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import api_router
 from app.core.config import settings
+from app.core.security import RateLimitMiddleware, SecurityHeadersMiddleware
 
 app = FastAPI(
     title=settings.app_name,
@@ -27,6 +28,15 @@ app = FastAPI(
     debug=settings.debug,
 )
 
+# Orden: CORS se registra al final para quedar como capa externa y cubrir tambien las respuestas 429.
+app.add_middleware(
+    RateLimitMiddleware,
+    reglas={
+        "/agente/chat": (10, 60),
+        "/semantica": (30, 60),
+    },
+)
+app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
