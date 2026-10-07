@@ -1,12 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { chatear, type Producto } from "@/lib/api";
 
-type Mensaje = { rol: "usuario" | "asistente"; texto: string };
+type Mensaje = { rol: "usuario" | "asistente"; texto: string; productos?: Producto[] };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+type Props = {
+  sedeId: number | null;
+  onAgregar?: (p: Producto) => void;
+};
 
-export default function ChatAgente() {
+const cop = new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 });
+
+export default function ChatAgente({ sedeId, onAgregar }: Props) {
   const [abierto, setAbierto] = useState(false);
   const [input, setInput] = useState("");
   const [cargando, setCargando] = useState(false);
@@ -21,17 +27,13 @@ export default function ChatAgente() {
     setMensajes((m) => [...m, { rol: "usuario", texto }]);
     setCargando(true);
     try {
-      const res = await fetch(`${API_URL}/api/v1/agente/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mensaje: texto }),
-      });
-      if (!res.ok) throw new Error(String(res.status));
-      const data = await res.json();
-      const respuesta = data.respuesta ?? data.response ?? data.message ?? "No pude generar una respuesta.";
-      setMensajes((m) => [...m, { rol: "asistente", texto: String(respuesta) }]);
+      const { respuesta, productos } = await chatear(texto, sedeId);
+      setMensajes((m) => [...m, { rol: "asistente", texto: respuesta, productos }]);
     } catch {
-      setMensajes((m) => [...m, { rol: "asistente", texto: "No me pude conectar con el servidor. Intenta de nuevo." }]);
+      setMensajes((m) => [
+        ...m,
+        { rol: "asistente", texto: "No me pude conectar con el servidor. Intenta de nuevo." },
+      ]);
     } finally {
       setCargando(false);
     }
@@ -40,7 +42,7 @@ export default function ChatAgente() {
   return (
     <div className="fixed bottom-4 right-4 z-50">
       {abierto && (
-        <div className="mb-3 flex h-[28rem] w-80 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10">
+        <div className="mb-3 flex h-[32rem] w-80 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10 sm:w-96">
           <div className="flex items-center justify-between bg-brand-red px-4 py-3 text-white">
             <span className="font-bold">🤖 Asistente RAG</span>
             <button onClick={() => setAbierto(false)} aria-label="Cerrar" className="text-xl leading-none">×</button>
@@ -50,15 +52,37 @@ export default function ChatAgente() {
             Recomendaciones procesadas en tiempo real por un modelo local (Ollama qwen2.5:7b + pgvector).
           </div>
 
-          <div className="flex-1 space-y-2 overflow-y-auto bg-brand-bg p-3">
+          <div className="flex-1 space-y-3 overflow-y-auto bg-brand-bg p-3">
             {mensajes.map((m, i) => (
-              <div
-                key={i}
-                className={`max-w-[85%] whitespace-pre-wrap rounded-xl px-3 py-2 text-sm ${
-                  m.rol === "usuario" ? "ml-auto bg-brand-red text-white" : "bg-white text-brand-dark shadow-sm"
-                }`}
-              >
-                {m.texto}
+              <div key={i} className={m.rol === "usuario" ? "flex justify-end" : "flex justify-start"}>
+                <div className="max-w-[90%] space-y-2">
+                  <div
+                    className={`whitespace-pre-wrap rounded-xl px-3 py-2 text-sm ${
+                      m.rol === "usuario" ? "bg-brand-red text-white" : "bg-white text-brand-dark shadow-sm"
+                    }`}
+                  >
+                    {m.texto}
+                  </div>
+
+                  {m.productos?.map((p, j) => (
+                    <div
+                      key={`${p.id}-${j}`}
+                      className="flex items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white p-2 shadow-sm"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-xs font-semibold text-brand-dark">{p.nombre}</p>
+                        <p className="text-sm font-extrabold text-brand-red">{cop.format(p.precio)}</p>
+                      </div>
+                      <button
+                        onClick={() => onAgregar?.(p)}
+                        disabled={p.stock <= 0}
+                        className="shrink-0 rounded-md bg-brand-green px-2 py-1 text-[11px] font-bold text-white hover:bg-brand-green-dark disabled:bg-gray-300"
+                      >
+                        {p.stock > 0 ? "Agregar al carrito" : "Agotado"}
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
             {cargando && <div className="text-xs text-gray-500">Pensando…</div>}
