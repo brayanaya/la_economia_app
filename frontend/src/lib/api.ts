@@ -1,57 +1,84 @@
-﻿import axios from 'axios';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const BASE = `${API_URL}/api/v1`;
 
-export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1',
-  headers: { 'Content-Type': 'application/json' },
-});
+export type Sede = { nombre: string; id: number | null };
 
-export interface ProductoRecuperado {
-  producto_id: string;
+// AJUSTA los IDs a los reales de tu base de datos
+export const SEDES: Sede[] = [
+  { nombre: "Todas", id: null },
+  { nombre: "Santa Isabel", id: 1 },
+  { nombre: "Machines", id: 2 },
+];
+
+export type Producto = {
+  id: string | number;
   nombre: string;
-  categoria_nombre: string | null;
   precio: number;
-  stock_sede: number | null;
-  similitud: number;
+  stock: number;
+  sede?: string;
+  imagen?: string;
+  similitud?: number; // 0 a 1
+};
+
+type Raw = Record<string, unknown>;
+
+function num(v: unknown, def = 0): number {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : def;
 }
 
-export interface BusquedaSemanticaRequest {
-  consulta: string;
-  sede_id?: string | null;
-  top_k?: number;
-  limite_resultados?: number;
+export function normalizarProducto(raw: Raw, i = 0): Producto {
+  const sim = raw.similitud ?? raw.similarity ?? raw.score;
+  let similitud: number | undefined;
+  if (sim !== undefined && sim !== null) {
+    const s = num(sim, NaN);
+    if (!Number.isNaN(s)) similitud = s > 1 ? s / 100 : s;
+  }
+  const sede = raw.sede ?? raw.sede_nombre;
+  const imagen = raw.imagen ?? raw.imagen_url ?? raw.image;
+  return {
+    id: (raw.id ?? raw.producto_id ?? i) as string | number,
+    nombre: String(raw.nombre ?? raw.name ?? raw.descripcion ?? "Producto"),
+    precio: num(raw.precio ?? raw.precio_venta ?? raw.price),
+    stock: num(raw.stock ?? raw.stock_disponible ?? raw.cantidad),
+    sede: sede ? String(sede) : undefined,
+    imagen: imagen ? String(imagen) : undefined,
+    similitud,
+  };
 }
 
-export interface BusquedaSemanticaResponse {
-  consulta: string;
-  resultados: ProductoRecuperado[];
-  candidatos_ampliados: boolean;
+function extraerLista(data: unknown): Raw[] {
+  if (Array.isArray(data)) return data as Raw[];
+  if (data && typeof data === "object") {
+    const d = data as Raw;
+    for (const k of ["resultados", "productos", "items", "data"]) {
+      if (Array.isArray(d[k])) return d[k] as Raw[];
+    }
+  }
+  return [];
 }
 
-export interface AgenteChatRequest {
-  mensaje: string;
-  sede_id?: string | null;
+async function post(path: string, body: unknown): Promise<unknown> {
+  const res = await fetch(`${BASE}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
 }
 
-export interface AgenteChatResponse {
-  mensaje: string;
-  respuesta: string;
-  productos_recomendados: ProductoRecuperado[];
-  hubo_resultados_relevantes: boolean;
+export async function buscarSemantica(consulta: string, sedeId: number | null, topK = 8): Promise<Producto[]> {
+  const data = await post("/busqueda/semantica", { consulta, sede_id: sedeId, top_k: topK });
+  return extraerLista(data).map(normalizarProducto);
 }
 
-export async function buscarProductos(
-  payload: BusquedaSemanticaRequest
-): Promise<BusquedaSemanticaResponse> {
-  const { data } = await api.post<BusquedaSemanticaResponse>(
-    '/busqueda/semantica',
-    payload
-  );
-  return data;
-}
-
-export async function enviarMensajeAgente(
-  payload: AgenteChatRequest
-): Promise<AgenteChatResponse> {
-  const { data } = await api.post<AgenteChatResponse>('/agente/chat', payload);
-  return data;
+export async function chatear(
+  mensaje: string,
+  sedeId: number | null
+): Promise<{ respuesta: string; productos: Producto[] }> {
+  const data = (await post("/agente/chat", { mensaje, sede_id: sedeId })) as Raw;
+  const respuesta = String(data.respuesta ?? data.response ?? data.message ?? "No pude generar una respuesta.");
+  const productos = extraerLista({ productos: data.productos_recomendados }).map(normalizarProducto);
+  return { respuesta, productos };
 }

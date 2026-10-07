@@ -1,19 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { SEDES } from "@/lib/api";
 
 type Props = {
+  sede: string;
+  onSedeChange: (nombre: string) => void;
   cartCount?: number;
   onCartClick?: () => void;
   onAccountClick?: () => void;
-  onSedeChange?: (sede: string) => void;
 };
 
-const SEDES = ["Santa Isabel", "Machines"];
-
-export default function Navbar({ cartCount = 0, onCartClick, onAccountClick, onSedeChange }: Props) {
-  const [sede, setSede] = useState(SEDES[0]);
-
+export default function Navbar({ sede, onSedeChange, cartCount = 0, onCartClick, onAccountClick }: Props) {
   return (
     <header className="w-full">
       <div className="bg-brand-dark text-white text-xs">
@@ -22,14 +19,11 @@ export default function Navbar({ cartCount = 0, onCartClick, onAccountClick, onS
             <span className="text-brand-yellow">📍 Sede:</span>
             <select
               value={sede}
-              onChange={(e) => {
-                setSede(e.target.value);
-                onSedeChange?.(e.target.value);
-              }}
+              onChange={(e) => onSedeChange(e.target.value)}
               className="rounded bg-brand-dark px-2 py-1 text-white outline-none ring-1 ring-white/30 focus:ring-brand-yellow"
             >
               {SEDES.map((s) => (
-                <option key={s} value={s}>{s}</option>
+                <option key={s.nombre} value={s.nombre}>{s.nombre}</option>
               ))}
             </select>
           </div>
