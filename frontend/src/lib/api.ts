@@ -82,3 +82,24 @@ export async function chatear(
   const productos = extraerLista({ productos: data.productos_recomendados }).map(normalizarProducto);
   return { respuesta, productos };
 }
+
+export async function registrarConsentimiento(
+  aceptoPolitica: boolean,
+  aceptoCookies: boolean,
+  versionPolitica: string
+): Promise<boolean> {
+  try {
+    const res = await fetch(`${BASE}/legal/consentimiento`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        acepto_politica: aceptoPolitica,
+        acepto_cookies: aceptoCookies,
+        version_politica: versionPolitica,
+      }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}

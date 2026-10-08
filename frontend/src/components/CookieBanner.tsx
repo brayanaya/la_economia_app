@@ -1,8 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { registrarConsentimiento } from "@/lib/api";
 
 const KEY = "habeas_data_consent";
+// Identifica el texto del banner que vio la persona (aun no hay una politica publicada con version).
+const VERSION_TEXTO = "banner-2026-10";
+// false = solo se registran las aceptaciones en el backend.
+const REGISTRAR_RECHAZOS = true;
 
 export default function CookieBanner() {
   const [visible, setVisible] = useState(false);
@@ -19,6 +24,9 @@ export default function CookieBanner() {
     try {
       localStorage.setItem(KEY, valor);
     } catch {}
+    // Traza de auditoria en el backend; si falla, la interfaz no se bloquea.
+    const acepto = valor === "aceptado";
+    if (acepto || REGISTRAR_RECHAZOS) void registrarConsentimiento(acepto, acepto, VERSION_TEXTO);
     setVisible(false);
   }
 
