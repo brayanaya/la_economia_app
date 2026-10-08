@@ -34,6 +34,7 @@ app.add_middleware(
     reglas={
         "/agente/chat": (10, 60),
         "/semantica": (30, 60),
+        "/consentimiento": (20, 60),
     },
 )
 app.add_middleware(SecurityHeadersMiddleware)
