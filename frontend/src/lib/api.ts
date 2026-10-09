@@ -1,4 +1,7 @@
-export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+// Acepta NEXT_PUBLIC_API_URL con o sin el sufijo /api/v1 y barras finales: BASE agrega /api/v1 una sola vez.
+export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000")
+  .replace(/\/+$/, "")
+  .replace(/\/api\/v1$/, "");
 const BASE = `${API_URL}/api/v1`;
 
 export type Sede = { nombre: string; id: number | null };
