@@ -4,13 +4,13 @@ export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:800
   .replace(/\/api\/v1$/, "");
 const BASE = `${API_URL}/api/v1`;
 
-export type Sede = { nombre: string; id: number | null };
+export type Sede = { nombre: string; id: string | null };
 
-// AJUSTA los IDs a los reales de tu base de datos
+// IDs reales de la tabla sedes (UUID); si cambias el seed, actualiza estos valores.
 export const SEDES: Sede[] = [
   { nombre: "Todas", id: null },
-  { nombre: "Santa Isabel", id: 1 },
-  { nombre: "Machines", id: 2 },
+  { nombre: "Santa Isabel", id: "a0000000-0000-0000-0000-000000000001" },
+  { nombre: "Machines", id: "a0000000-0000-0000-0000-000000000002" },
 ];
 
 export type Producto = {
@@ -71,14 +71,14 @@ async function post(path: string, body: unknown): Promise<unknown> {
   return res.json();
 }
 
-export async function buscarSemantica(consulta: string, sedeId: number | null, topK = 8): Promise<Producto[]> {
+export async function buscarSemantica(consulta: string, sedeId: string | null, topK = 8): Promise<Producto[]> {
   const data = await post("/busqueda/busqueda/semantica", { consulta, sede_id: sedeId, top_k: topK });
   return extraerLista(data).map(normalizarProducto);
 }
 
 export async function chatear(
   mensaje: string,
-  sedeId: number | null
+  sedeId: string | null
 ): Promise<{ respuesta: string; productos: Producto[] }> {
   const data = (await post("/agente/chat", { mensaje, sede_id: sedeId })) as Raw;
   const respuesta = String(data.respuesta ?? data.response ?? data.message ?? "No pude generar una respuesta.");
