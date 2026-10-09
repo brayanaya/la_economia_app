@@ -6,7 +6,7 @@ import { chatear, type Producto } from "@/lib/api";
 type Mensaje = { rol: "usuario" | "asistente"; texto: string; productos?: Producto[] };
 
 type Props = {
-  sedeId: number | null;
+  sedeId: string | null;
   onAgregar?: (p: Producto) => void;
 };
 
