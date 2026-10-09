@@ -46,6 +46,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# --- Modulo ordenes (carrito) ---
+from app.ordenes.router import router as ordenes_router
+app.include_router(ordenes_router, prefix="/api/v1")
 app.include_router(api_router, prefix=settings.api_v1_prefix)
 
 
