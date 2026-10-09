@@ -33,7 +33,7 @@ export default function CookieBanner() {
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t-4 border-brand-yellow bg-brand-dark p-4 text-white shadow-2xl">
+    <div className="fixed inset-x-0 bottom-0 z-[60] border-t-4 border-brand-yellow bg-brand-dark p-4 text-white shadow-2xl">
       <div className="mx-auto flex max-w-7xl flex-col items-start gap-3 md:flex-row md:items-center">
         <p className="flex-1 text-xs md:text-sm">
           En cumplimiento de la <strong>Ley 1581 de 2012 (Habeas Data)</strong>, usamos tus datos personales y
