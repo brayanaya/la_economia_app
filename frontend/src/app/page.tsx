@@ -54,7 +54,7 @@ function EstadoVacio({
 }
 
 export default function Home() {
-  const { agregar, totalItems: carrito } = useCarrito();
+  const { agregar, abrir, totalItems: carrito } = useCarrito();
   const [sede, setSede] = useState(SEDES[1]);
   const [consulta, setConsulta] = useState(CONSULTA_INICIAL);
   const [productos, setProductos] = useState<Producto[]>([]);
@@ -109,6 +109,7 @@ export default function Home() {
         sede={sede.nombre}
         onSedeChange={(n) => setSede(SEDES.find((s) => s.nombre === n) ?? SEDES[0])}
         cartCount={carrito}
+        onCartClick={abrir}
       />
 
       <main className="mx-auto max-w-7xl px-4 py-8">
@@ -168,4 +169,5 @@ export default function Home() {
     </div>
   );
 }
+
 

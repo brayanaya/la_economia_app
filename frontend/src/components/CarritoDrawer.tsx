@@ -21,7 +21,7 @@ interface GrupoSede {
 }
 
 export default function CarritoDrawer() {
-  const { items, hidratado, abierto, totalItems, totalPrecio, abrir, cerrar, cambiarCantidad, quitar, vaciarSede } =
+  const { items, hidratado, abierto, totalItems, totalPrecio, cerrar, cambiarCantidad, quitar, vaciarSede } =
     useCarrito();
   const [nombre, setNombre] = useState("");
   const [telefono, setTelefono] = useState("");
@@ -92,21 +92,6 @@ export default function CarritoDrawer() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={abrir}
-        aria-label="Abrir carrito de compras"
-        className="fixed bottom-4 left-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-green-600 text-white shadow-lg hover:bg-green-700"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-6 w-6" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l3-8H5.4M7 13L5.4 5M7 13l-2 4h13M9 21a1 1 0 100-2 1 1 0 000 2zm9 0a1 1 0 100-2 1 1 0 000 2z" />
-        </svg>
-        {hidratado && totalItems > 0 && (
-          <span className="absolute -right-1 -top-1 min-w-[1.4rem] rounded-full bg-red-600 px-1 text-center text-xs font-bold leading-6">
-            {totalItems}
-          </span>
-        )}
-      </button>
 
       {abierto && (
         <div className="fixed inset-0 z-[65]" role="dialog" aria-modal="true" aria-label="Carrito de compras">
@@ -202,3 +187,4 @@ export default function CarritoDrawer() {
     </>
   );
 }
+
