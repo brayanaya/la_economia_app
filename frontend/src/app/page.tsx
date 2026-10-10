@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
@@ -8,16 +8,18 @@ import ChatAgente from "@/components/ChatAgente";
 import FooterCompliance from "@/components/FooterCompliance";
 import CookieBanner from "@/components/CookieBanner";
 import { SEDES, buscarSemantica, type Producto } from "@/lib/api";
+import { useCarrito } from "@/context/CarritoContext";
+import { mostrarAviso } from "@/lib/aviso";
 
 const CONSULTA_INICIAL = "productos de la canasta familiar";
 
 export default function Home() {
+  const { agregar, totalItems: carrito } = useCarrito();
   const [sede, setSede] = useState(SEDES[1]);
   const [consulta, setConsulta] = useState(CONSULTA_INICIAL);
   const [productos, setProductos] = useState<Producto[]>([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [carrito, setCarrito] = useState(0);
 
   useEffect(() => {
     let cancelado = false;
@@ -41,6 +43,22 @@ export default function Home() {
       cancelado = true;
     };
   }, [consulta, sede.id]);
+
+  function agregarProducto(p: Producto): boolean {
+    if (sede.id === null) {
+      mostrarAviso("Elige una sede para agregar productos al carrito.");
+      return false;
+    }
+    agregar({
+      productoId: String(p.id),
+      nombre: p.nombre,
+      precio: p.precio,
+      sedeId: sede.id,
+      sedeNombre: sede.nombre,
+      imagen: p.imagen,
+    });
+    return true;
+  }
 
   const esInicial = consulta === CONSULTA_INICIAL;
 
@@ -80,14 +98,14 @@ export default function Home() {
               imagen={p.imagen}
               sede={p.sede ?? (sede.id === null ? "todas las sedes" : sede.nombre)}
               similitud={esInicial ? undefined : p.similitud}
-              onAgregar={() => setCarrito((c) => c + 1)}
+              onAgregar={() => agregarProducto(p)}
             />
           ))}
         </div>
       </main>
 
       <FooterCompliance />
-      <ChatAgente sedeId={sede.id} onAgregar={() => setCarrito((c) => c + 1)} />
+      <ChatAgente sedeId={sede.id} />
       <CookieBanner />
     </div>
   );
