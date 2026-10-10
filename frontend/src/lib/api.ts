@@ -1,4 +1,4 @@
-// Acepta NEXT_PUBLIC_API_URL con o sin el sufijo /api/v1 y barras finales: BASE agrega /api/v1 una sola vez.
+﻿// Acepta NEXT_PUBLIC_API_URL con o sin el sufijo /api/v1 y barras finales: BASE agrega /api/v1 una sola vez.
 export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000")
   .replace(/\/+$/, "")
   .replace(/\/api\/v1$/, "");
@@ -43,7 +43,7 @@ export function normalizarProducto(raw: Raw, i = 0): Producto {
     id: (raw.id ?? raw.producto_id ?? i) as string | number,
     nombre: String(raw.nombre ?? raw.name ?? raw.descripcion ?? "Producto"),
     precio: num(raw.precio ?? raw.precio_venta ?? raw.price),
-    stock: num(raw.stock ?? raw.stock_disponible ?? raw.cantidad),
+    stock: Number(raw.stock_sede ?? raw.stock ?? 0) || 0,
     sede: sede ? String(sede) : undefined,
     imagen: imagen ? String(imagen) : undefined,
     similitud,
