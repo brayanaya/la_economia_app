@@ -1,0 +1,277 @@
+MOTIVO: key={`${p.id}-${i}`} no es de la forma x.id: no puedo garantizar el id del producto.
+
+// ===== frontend\src\app\page.tsx =====
+
+"use client";
+
+import { useEffect, useState } from "react";
+import Navbar from "@/components/Navbar";
+import BuscadorSemantico from "@/components/BuscadorSemantico";
+import ProductoCard from "@/components/ProductoCard";
+import ChatAgente from "@/components/ChatAgente";
+import FooterCompliance from "@/components/FooterCompliance";
+import CookieBanner from "@/components/CookieBanner";
+import { SEDES, buscarSemantica, type Producto } from "@/lib/api";
+
+const CONSULTA_INICIAL = "productos de la canasta familiar";
+
+export default function Home() {
+  const [sede, setSede] = useState(SEDES[1]);
+  const [consulta, setConsulta] = useState(CONSULTA_INICIAL);
+  const [productos, setProductos] = useState<Producto[]>([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [carrito, setCarrito] = useState(0);
+
+  useEffect(() => {
+    let cancelado = false;
+    async function cargar() {
+      setCargando(true);
+      setError(null);
+      try {
+        const res = await buscarSemantica(consulta, sede.id, 8);
+        if (!cancelado) setProductos(res);
+      } catch {
+        if (!cancelado) {
+          setProductos([]);
+          setError("No pudimos conectar con el catálogo. Verifica que la API esté corriendo.");
+        }
+      } finally {
+        if (!cancelado) setCargando(false);
+      }
+    }
+    cargar();
+    return () => {
+      cancelado = true;
+    };
+  }, [consulta, sede.id]);
+
+  const esInicial = consulta === CONSULTA_INICIAL;
+
+  return (
+    <div className="min-h-screen bg-brand-bg">
+      <Navbar
+        sede={sede.nombre}
+        onSedeChange={(n) => setSede(SEDES.find((s) => s.nombre === n) ?? SEDES[0])}
+        cartCount={carrito}
+      />
+
+      <main className="mx-auto max-w-7xl px-4 py-8">
+        <BuscadorSemantico cargando={cargando} onBuscar={setConsulta} />
+
+        <h1 className="mb-1 mt-6 text-2xl font-extrabold text-brand-dark">
+          {esInicial ? "Catálogo" : `Resultados para "${consulta}"`}
+        </h1>
+        <p className="mb-6 text-sm text-gray-600">
+          {sede.id === null ? "Todas las sedes" : `Sede ${sede.nombre}`}
+        </p>
+
+        {error && (
+          <p className="mb-4 rounded-lg border border-brand-red/30 bg-white p-3 text-sm text-brand-red">{error}</p>
+        )}
+
+        {!cargando && !error && productos.length === 0 && (
+          <p className="text-sm text-gray-600">No encontramos productos para esa búsqueda.</p>
+        )}
+
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+          {productos.map((p, i) => (
+            <ProductoCard
+              key={`${p.id}-${i}`}
+              nombre={p.nombre}
+              precio={p.precio}
+              stock={p.stock}
+              imagen={p.imagen}
+              sede={p.sede ?? (sede.id === null ? "todas las sedes" : sede.nombre)}
+              similitud={esInicial ? undefined : p.similitud}
+              onAgregar={() => setCarrito((c) => c + 1)}
+            />
+          ))}
+        </div>
+      </main>
+
+      <FooterCompliance />
+      <ChatAgente sedeId={sede.id} onAgregar={() => setCarrito((c) => c + 1)} />
+      <CookieBanner />
+    </div>
+  );
+}
+
+// ===== frontend\src\components\ProductoCard.tsx =====
+
+type Props = {
+  nombre: string;
+  precio: number;
+  imagen?: string;
+  sede: string;
+  stock: number;
+  /** Similitud pgvector, 0 a 1. Solo en resultados RAG. */
+  similitud?: number;
+  onAgregar?: () => void;
+};
+
+const cop = new Intl.NumberFormat("es-CO", {
+  style: "currency",
+  currency: "COP",
+  maximumFractionDigits: 0,
+});
+
+export default function ProductoCard({ nombre, precio, imagen, sede, stock, similitud, onAgregar }: Props) {
+  const disponible = stock > 0;
+
+  return (
+    <article className="relative flex flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md">
+      {similitud !== undefined && (
+        <span className="absolute left-3 top-3 z-10 rounded-full bg-brand-yellow px-2 py-1 text-[11px] font-bold text-brand-dark">
+          🎯 {Math.round(similitud * 100)}% coincidencia
+        </span>
+      )}
+
+      <div className="mb-3 flex h-40 items-center justify-center overflow-hidden rounded-lg bg-brand-bg">
+        {imagen ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={imagen} alt={nombre} className="h-full w-full object-contain" />
+        ) : (
+          <span className="text-4xl">🛒</span>
+        )}
+      </div>
+
+      <h3 className="line-clamp-2 min-h-10 text-sm font-semibold text-brand-dark">{nombre}</h3>
+      <p className="mt-2 text-xl font-extrabold text-brand-red">{cop.format(precio)}</p>
+
+      <p className={`mt-1 text-xs font-medium ${disponible ? "text-brand-green" : "text-brand-red"}`}>
+        {disponible ? `● ${stock} disponibles en ${sede}` : `● Agotado en ${sede}`}
+      </p>
+
+      <button
+        onClick={onAgregar}
+        disabled={!disponible}
+        className="mt-3 w-full rounded-lg bg-brand-green py-2 text-sm font-bold text-white transition hover:bg-brand-green-dark disabled:cursor-not-allowed disabled:bg-gray-300"
+      >
+        Agregar al carrito
+      </button>
+    </article>
+  );
+}
+
+// ===== frontend\src\components\ChatAgente.tsx =====
+
+"use client";
+
+import { useState } from "react";
+import { chatear, type Producto } from "@/lib/api";
+
+type Mensaje = { rol: "usuario" | "asistente"; texto: string; productos?: Producto[] };
+
+type Props = {
+  sedeId: string | null;
+  onAgregar?: (p: Producto) => void;
+};
+
+const cop = new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 });
+
+export default function ChatAgente({ sedeId, onAgregar }: Props) {
+  const [abierto, setAbierto] = useState(false);
+  const [input, setInput] = useState("");
+  const [cargando, setCargando] = useState(false);
+  const [mensajes, setMensajes] = useState<Mensaje[]>([
+    { rol: "asistente", texto: "¡Hola! Soy tu asistente de compras. Cuéntame qué necesitas y te recomiendo productos." },
+  ]);
+
+  async function enviar() {
+    const texto = input.trim();
+    if (!texto || cargando) return;
+    setInput("");
+    setMensajes((m) => [...m, { rol: "usuario", texto }]);
+    setCargando(true);
+    try {
+      const { respuesta, productos } = await chatear(texto, sedeId);
+      setMensajes((m) => [...m, { rol: "asistente", texto: respuesta, productos }]);
+    } catch {
+      setMensajes((m) => [
+        ...m,
+        { rol: "asistente", texto: "No me pude conectar con el servidor. Intenta de nuevo." },
+      ]);
+    } finally {
+      setCargando(false);
+    }
+  }
+
+  return (
+    <div className="fixed bottom-4 right-4 z-50">
+      {abierto && (
+        <div className="mb-3 flex h-[32rem] w-80 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10 sm:w-96">
+          <div className="flex items-center justify-between bg-brand-red px-4 py-3 text-white">
+            <span className="font-bold">🤖 Asistente RAG</span>
+            <button onClick={() => setAbierto(false)} aria-label="Cerrar" className="text-xl leading-none">×</button>
+          </div>
+
+          <div className="bg-brand-yellow px-3 py-1 text-[11px] font-medium text-brand-dark">
+            Recomendaciones procesadas en tiempo real por un modelo local (Ollama qwen2.5:7b + pgvector).
+          </div>
+
+          <div className="flex-1 space-y-3 overflow-y-auto bg-brand-bg p-3">
+            {mensajes.map((m, i) => (
+              <div key={i} className={m.rol === "usuario" ? "flex justify-end" : "flex justify-start"}>
+                <div className="max-w-[90%] space-y-2">
+                  <div
+                    className={`whitespace-pre-wrap rounded-xl px-3 py-2 text-sm ${
+                      m.rol === "usuario" ? "bg-brand-red text-white" : "bg-white text-brand-dark shadow-sm"
+                    }`}
+                  >
+                    {m.texto}
+                  </div>
+
+                  {m.productos?.map((p, j) => (
+                    <div
+                      key={`${p.id}-${j}`}
+                      className="flex items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white p-2 shadow-sm"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-xs font-semibold text-brand-dark">{p.nombre}</p>
+                        <p className="text-sm font-extrabold text-brand-red">{cop.format(p.precio)}</p>
+                      </div>
+                      <button
+                        onClick={() => onAgregar?.(p)}
+                        disabled={p.stock <= 0}
+                        className="shrink-0 rounded-md bg-brand-green px-2 py-1 text-[11px] font-bold text-white hover:bg-brand-green-dark disabled:bg-gray-300"
+                      >
+                        {p.stock > 0 ? "Agregar al carrito" : "Agotado"}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+            {cargando && <div className="text-xs text-gray-500">Pensando…</div>}
+          </div>
+
+          <div className="flex gap-2 border-t border-gray-200 bg-white p-2">
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && enviar()}
+              placeholder="¿Qué buscas hoy?"
+              className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm text-brand-dark outline-none focus:border-brand-red"
+            />
+            <button
+              onClick={enviar}
+              disabled={cargando}
+              className="rounded-lg bg-brand-green px-3 text-sm font-bold text-white hover:bg-brand-green-dark disabled:opacity-50"
+            >
+              Enviar
+            </button>
+          </div>
+        </div>
+      )}
+
+      <button
+        onClick={() => setAbierto((v) => !v)}
+        className="ml-auto flex h-14 w-14 items-center justify-center rounded-full border-2 border-brand-yellow bg-brand-red text-2xl shadow-lg transition hover:bg-brand-red-dark"
+        aria-label="Abrir asistente"
+      >
+        💬
+      </button>
+    </div>
+  );
+}
