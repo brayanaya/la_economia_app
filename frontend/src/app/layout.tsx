@@ -1,10 +1,10 @@
-﻿import CookieBanner from "@/components/CookieBanner";
-import AvisoGlobal from "@/components/AvisoGlobal";
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { CarritoProvider } from "@/context/CarritoContext";
 import CarritoDrawer from "@/components/CarritoDrawer";
+import CookieBanner from "@/components/CookieBanner";
+import AvisoGlobal from "@/components/AvisoGlobal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,19 +24,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="es" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-<CarritoProvider>{children}<CarritoDrawer />
-</CarritoProvider>
-<CookieBanner />
+        <CarritoProvider>
+          {children}
+          <CarritoDrawer />
+        </CarritoProvider>
+        <CookieBanner />
         <AvisoGlobal />
       </body>
     </html>
   );
 }
-
-
-
