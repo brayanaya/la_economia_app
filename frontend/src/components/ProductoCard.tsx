@@ -41,7 +41,7 @@ export default function ProductoCard({ nombre, precio, imagen, sede, stock, simi
   }
 
   return (
-    <article className="group relative flex flex-col rounded-2xl border border-black/5 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+    <article className="group relative flex flex-col rounded-2xl border border-black/5 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
       {similitud !== undefined && (
         <span className="absolute left-3 top-3 z-10 rounded-full bg-brand-yellow px-2 py-1 text-[11px] font-bold text-brand-dark">
           🎯 {Math.round(similitud * 100)}% coincidencia
@@ -81,3 +81,4 @@ export default function ProductoCard({ nombre, precio, imagen, sede, stock, simi
     </article>
   );
 }
+
