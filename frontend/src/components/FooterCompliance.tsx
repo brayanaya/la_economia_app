@@ -1,3 +1,5 @@
+﻿import Link from "next/link";
+
 const ANIO = 2026;
 
 export default function FooterCompliance() {
@@ -10,6 +12,16 @@ export default function FooterCompliance() {
           {/* TODO: reemplazar por el NIT real antes de publicar */}
           <p>NIT: [PENDIENTE - completar con el NIT real]</p>
         </div>
+
+        <nav aria-label="Información legal" className="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <Link href="/privacidad" className="transition-colors hover:text-brand-yellow">
+            Política de privacidad
+          </Link>
+          <span aria-hidden className="text-white/20">|</span>
+          <Link href="/terminos" className="transition-colors hover:text-brand-yellow">
+            Términos y condiciones
+          </Link>
+        </nav>
 
         <p className="rounded-lg border border-white/10 p-3 text-xs">
           🤖 <strong>Aviso de transparencia:</strong> las recomendaciones del asistente son generadas por
