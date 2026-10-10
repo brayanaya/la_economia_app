@@ -7,7 +7,6 @@ import ProductoCard from "@/components/ProductoCard";
 import ProductoSkeleton from "@/components/ProductoSkeleton";
 import ChatAgente from "@/components/ChatAgente";
 import FooterCompliance from "@/components/FooterCompliance";
-import CookieBanner from "@/components/CookieBanner";
 import { SEDES, buscarSemantica, type Producto } from "@/lib/api";
 import { useCarrito } from "@/context/CarritoContext";
 import { mostrarAviso } from "@/lib/aviso";
@@ -166,7 +165,7 @@ export default function Home() {
 
       <FooterCompliance />
       <ChatAgente sedeId={sede.id} />
-      <CookieBanner />
     </div>
   );
 }
+

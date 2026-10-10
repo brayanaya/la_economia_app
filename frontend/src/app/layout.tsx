@@ -1,4 +1,5 @@
-﻿import AvisoGlobal from "@/components/AvisoGlobal";
+﻿import CookieBanner from "@/components/CookieBanner";
+import AvisoGlobal from "@/components/AvisoGlobal";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -30,10 +31,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
 <CarritoProvider>{children}<CarritoDrawer />
 </CarritoProvider>
-<AvisoGlobal />
+<CookieBanner />
+        <AvisoGlobal />
       </body>
     </html>
   );
 }
+
 
 
