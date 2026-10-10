@@ -145,11 +145,20 @@ export default function ChatAgente({ sedeId, onAgregar }: Props) {
 
       <button
         onClick={() => setAbierto((v) => !v)}
-        className="ml-auto flex h-14 w-14 items-center justify-center rounded-full border-2 border-brand-yellow bg-brand-red text-2xl shadow-lg transition hover:bg-brand-red-dark"
-        aria-label="Abrir asistente"
+        className="group relative ml-auto flex h-14 w-14 items-center justify-center rounded-full border-2 border-brand-yellow bg-brand-red text-2xl text-white shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl active:scale-95"
+        aria-label={abierto ? "Cerrar asistente" : "Abrir asistente"}
       >
-        💬
+        {!abierto && (
+          <span aria-hidden="true" className="absolute inset-0 -z-10 animate-ping rounded-full bg-brand-red/40" />
+        )}
+        <span aria-hidden="true">{abierto ? "×" : "💬"}</span>
+        {!abierto && (
+          <span className="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-brand-yellow px-1 text-[10px] font-extrabold text-brand-dark shadow">
+            IA
+          </span>
+        )}
       </button>
     </div>
   );
 }
+
