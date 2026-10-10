@@ -1,3 +1,4 @@
+﻿import AvisoGlobal from "@/components/AvisoGlobal";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -28,7 +29,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
 <CarritoProvider>{children}<CarritoDrawer />
 </CarritoProvider>
-</body>
+<AvisoGlobal />
+      </body>
     </html>
   );
 }
+

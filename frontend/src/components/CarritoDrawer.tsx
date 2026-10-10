@@ -1,9 +1,10 @@
-// carrito-v1
+﻿// carrito-v1
 "use client";
 
 import { useMemo, useState } from "react";
 import { useCarrito, type ItemCarrito } from "@/context/CarritoContext";
 import { crearOrden, type OrdenCreada } from "@/lib/ordenes";
+import { mostrarAviso } from "@/lib/aviso";
 
 const COP = new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 });
 
@@ -77,7 +78,10 @@ export default function CarritoDrawer() {
     }
     setEnviando(false);
     if (ok.length > 0) setCreadas(ok);
-    if (fallos.length > 0) setError(fallos.join(" | "));
+    if (fallos.length > 0) {
+      setError(fallos.join(" | "));
+      mostrarAviso("Error al procesar la orden. Inténtalo de nuevo.");
+    }
   };
 
   const cerrarTodo = () => {
