@@ -1,3 +1,7 @@
+﻿"use client";
+
+import { useEffect, useRef, useState } from "react";
+
 type Props = {
   nombre: string;
   precio: number;
@@ -6,7 +10,8 @@ type Props = {
   stock: number;
   /** Similitud pgvector, 0 a 1. Solo en resultados RAG. */
   similitud?: number;
-  onAgregar?: () => void;
+  /** Devuelve false si no se pudo agregar (ej. sin sede elegida). */
+  onAgregar?: () => void | boolean;
 };
 
 const cop = new Intl.NumberFormat("es-CO", {
@@ -17,19 +22,40 @@ const cop = new Intl.NumberFormat("es-CO", {
 
 export default function ProductoCard({ nombre, precio, imagen, sede, stock, similitud, onAgregar }: Props) {
   const disponible = stock > 0;
+  const [agregado, setAgregado] = useState(false);
+  const temporizador = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (temporizador.current) clearTimeout(temporizador.current);
+    };
+  }, []);
+
+  function manejarClick() {
+    if (!disponible) return;
+    const resultado = onAgregar?.();
+    if (resultado === false) return;
+    setAgregado(true);
+    if (temporizador.current) clearTimeout(temporizador.current);
+    temporizador.current = setTimeout(() => setAgregado(false), 1400);
+  }
 
   return (
-    <article className="relative flex flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md">
+    <article className="group relative flex flex-col rounded-2xl border border-black/5 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
       {similitud !== undefined && (
         <span className="absolute left-3 top-3 z-10 rounded-full bg-brand-yellow px-2 py-1 text-[11px] font-bold text-brand-dark">
           🎯 {Math.round(similitud * 100)}% coincidencia
         </span>
       )}
 
-      <div className="mb-3 flex h-40 items-center justify-center overflow-hidden rounded-lg bg-brand-bg">
+      <div className="mb-3 flex h-40 items-center justify-center overflow-hidden rounded-xl bg-brand-bg">
         {imagen ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={imagen} alt={nombre} className="h-full w-full object-contain" />
+          <img
+            src={imagen}
+            alt={nombre}
+            className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
+          />
         ) : (
           <span className="text-4xl">🛒</span>
         )}
@@ -43,11 +69,14 @@ export default function ProductoCard({ nombre, precio, imagen, sede, stock, simi
       </p>
 
       <button
-        onClick={onAgregar}
+        type="button"
+        onClick={manejarClick}
         disabled={!disponible}
-        className="mt-3 w-full rounded-lg bg-brand-green py-2 text-sm font-bold text-white transition hover:bg-brand-green-dark disabled:cursor-not-allowed disabled:bg-gray-300"
+        className={`mt-3 w-full rounded-xl py-2 text-sm font-bold text-white transition-all duration-200 active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:active:scale-100 ${
+          agregado ? "bg-emerald-600" : "bg-brand-green hover:bg-brand-green-dark"
+        }`}
       >
-        Agregar al carrito
+        {agregado ? "¡Agregado! ✓" : "Agregar al carrito"}
       </button>
     </article>
   );
