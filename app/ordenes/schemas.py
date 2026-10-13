@@ -1,4 +1,4 @@
-# carrito-v1
+﻿# carrito-v1
 from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
@@ -51,3 +51,27 @@ class OrdenOut(BaseModel):
     estado: str
     creado_en: datetime
     items: List[DetalleOrdenOut]
+
+
+class DetalleOrdenPublicoOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    nombre: str
+    imagen_url: Optional[str] = None
+    cantidad: int
+    precio_unitario: Decimal
+    subtotal: Decimal
+
+
+class OrdenConsultaOut(BaseModel):
+    """Vista publica de un pedido: sin telefono ni notas (datos personales, Ley 1581 de 2012)."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    sede_id: UUID
+    cliente_nombre: str
+    total: Decimal
+    estado: str
+    creado_en: datetime
+    items: List[DetalleOrdenPublicoOut]
