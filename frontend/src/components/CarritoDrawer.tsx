@@ -1,9 +1,10 @@
-// carrito-v1
+﻿// carrito-v1
 "use client";
 
 import { useMemo, useState } from "react";
 import { useCarrito, type ItemCarrito } from "@/context/CarritoContext";
 import { crearOrden, type OrdenCreada } from "@/lib/ordenes";
+import { mostrarAviso } from "@/lib/aviso";
 
 const COP = new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 });
 
@@ -20,7 +21,7 @@ interface GrupoSede {
 }
 
 export default function CarritoDrawer() {
-  const { items, hidratado, abierto, totalItems, totalPrecio, abrir, cerrar, cambiarCantidad, quitar, vaciarSede } =
+  const { items, hidratado, abierto, totalItems, totalPrecio, cerrar, cambiarCantidad, quitar, vaciarSede } =
     useCarrito();
   const [nombre, setNombre] = useState("");
   const [telefono, setTelefono] = useState("");
@@ -77,7 +78,10 @@ export default function CarritoDrawer() {
     }
     setEnviando(false);
     if (ok.length > 0) setCreadas(ok);
-    if (fallos.length > 0) setError(fallos.join(" | "));
+    if (fallos.length > 0) {
+      setError(fallos.join(" | "));
+      mostrarAviso("Error al procesar la orden. Inténtalo de nuevo.");
+    }
   };
 
   const cerrarTodo = () => {
@@ -88,26 +92,11 @@ export default function CarritoDrawer() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={abrir}
-        aria-label="Abrir carrito de compras"
-        className="fixed bottom-4 left-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-green-600 text-white shadow-lg hover:bg-green-700"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-6 w-6" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l3-8H5.4M7 13L5.4 5M7 13l-2 4h13M9 21a1 1 0 100-2 1 1 0 000 2zm9 0a1 1 0 100-2 1 1 0 000 2z" />
-        </svg>
-        {hidratado && totalItems > 0 && (
-          <span className="absolute -right-1 -top-1 min-w-[1.4rem] rounded-full bg-red-600 px-1 text-center text-xs font-bold leading-6">
-            {totalItems}
-          </span>
-        )}
-      </button>
 
       {abierto && (
         <div className="fixed inset-0 z-[65]" role="dialog" aria-modal="true" aria-label="Carrito de compras">
-          <div className="absolute inset-0 bg-black/50" onClick={cerrarTodo} />
-          <aside className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-white shadow-xl">
+          <div className="anim-fade absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={cerrarTodo} />
+          <aside className="anim-drawer absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-white shadow-2xl">
             <header className="flex items-center justify-between border-b px-4 py-3">
               <h2 className="text-lg font-bold text-gray-900">Tu carrito</h2>
               <button type="button" onClick={cerrarTodo} aria-label="Cerrar carrito" className="rounded p-1 text-2xl leading-none text-gray-600 hover:bg-gray-100">
@@ -198,3 +187,6 @@ export default function CarritoDrawer() {
     </>
   );
 }
+
+
+

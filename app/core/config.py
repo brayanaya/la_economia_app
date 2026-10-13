@@ -1,4 +1,4 @@
-from urllib.parse import quote_plus
+﻿from urllib.parse import quote_plus
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     app_version: str = "0.1.0"
     api_v1_prefix: str = "/api/v1"
     debug: bool = False
-    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:8081"]
+    cors_origins: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000", "http://192.168.56.1:3000", "http://localhost:8081"]
 
     postgres_user: str
     postgres_password: str
@@ -49,3 +49,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+

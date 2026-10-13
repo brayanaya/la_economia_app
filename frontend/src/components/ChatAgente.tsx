@@ -1,7 +1,9 @@
-"use client";
+﻿"use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { chatear, type Producto } from "@/lib/api";
+import { useCarrito } from "@/context/CarritoContext";
+import { mostrarAviso } from "@/lib/aviso";
 
 type Mensaje = { rol: "usuario" | "asistente"; texto: string; productos?: Producto[] };
 
@@ -13,12 +15,40 @@ type Props = {
 const cop = new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 });
 
 export default function ChatAgente({ sedeId, onAgregar }: Props) {
+  const { agregar } = useCarrito();
   const [abierto, setAbierto] = useState(false);
   const [input, setInput] = useState("");
   const [cargando, setCargando] = useState(false);
+  const [agregadoKey, setAgregadoKey] = useState<string | null>(null);
+  const temporizador = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [mensajes, setMensajes] = useState<Mensaje[]>([
     { rol: "asistente", texto: "¡Hola! Soy tu asistente de compras. Cuéntame qué necesitas y te recomiendo productos." },
   ]);
+
+  useEffect(() => {
+    return () => {
+      if (temporizador.current) clearTimeout(temporizador.current);
+    };
+  }, []);
+
+  function agregarDesdeChat(p: Producto, clave: string) {
+    if (sedeId === null) {
+      mostrarAviso("Elige una sede para agregar productos desde el chat.");
+      return;
+    }
+    agregar({
+      productoId: String(p.id),
+      nombre: p.nombre,
+      precio: p.precio,
+      sedeId,
+      imagen: p.imagen ?? undefined,
+    });
+    mostrarAviso(`${p.nombre} agregado al carrito.`);
+    setAgregadoKey(clave);
+    if (temporizador.current) clearTimeout(temporizador.current);
+    temporizador.current = setTimeout(() => setAgregadoKey(null), 1400);
+    onAgregar?.(p);
+  }
 
   async function enviar() {
     const texto = input.trim();
@@ -64,24 +94,30 @@ export default function ChatAgente({ sedeId, onAgregar }: Props) {
                     {m.texto}
                   </div>
 
-                  {m.productos?.map((p, j) => (
-                    <div
-                      key={`${p.id}-${j}`}
-                      className="flex items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white p-2 shadow-sm"
-                    >
-                      <div className="min-w-0">
-                        <p className="truncate text-xs font-semibold text-brand-dark">{p.nombre}</p>
-                        <p className="text-sm font-extrabold text-brand-red">{cop.format(p.precio)}</p>
-                      </div>
-                      <button
-                        onClick={() => onAgregar?.(p)}
-                        disabled={p.stock <= 0}
-                        className="shrink-0 rounded-md bg-brand-green px-2 py-1 text-[11px] font-bold text-white hover:bg-brand-green-dark disabled:bg-gray-300"
+                  {m.productos?.map((p, j) => {
+                    const clave = `${i}-${j}`;
+                    const agregado = agregadoKey === clave;
+                    return (
+                      <div
+                        key={`${p.id}-${j}`}
+                        className="flex items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white p-2 shadow-sm"
                       >
-                        {p.stock > 0 ? "Agregar al carrito" : "Agotado"}
-                      </button>
-                    </div>
-                  ))}
+                        <div className="min-w-0">
+                          <p className="truncate text-xs font-semibold text-brand-dark">{p.nombre}</p>
+                          <p className="text-sm font-extrabold text-brand-red">{cop.format(p.precio)}</p>
+                        </div>
+                        <button
+                          onClick={() => agregarDesdeChat(p, clave)}
+                          disabled={p.stock <= 0}
+                          className={`shrink-0 rounded-md px-2 py-1 text-[11px] font-bold text-white transition-all duration-200 active:scale-95 disabled:bg-gray-300 disabled:active:scale-100 ${
+                            agregado ? "bg-emerald-600" : "bg-brand-green hover:bg-brand-green-dark"
+                          }`}
+                        >
+                          {p.stock <= 0 ? "Agotado" : agregado ? "¡Agregado! ✓" : "Agregar al carrito"}
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ))}
@@ -109,11 +145,20 @@ export default function ChatAgente({ sedeId, onAgregar }: Props) {
 
       <button
         onClick={() => setAbierto((v) => !v)}
-        className="ml-auto flex h-14 w-14 items-center justify-center rounded-full border-2 border-brand-yellow bg-brand-red text-2xl shadow-lg transition hover:bg-brand-red-dark"
-        aria-label="Abrir asistente"
+        className="group relative ml-auto flex h-14 w-14 items-center justify-center rounded-full border-2 border-brand-yellow bg-brand-red text-2xl text-white shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl active:scale-95"
+        aria-label={abierto ? "Cerrar asistente" : "Abrir asistente"}
       >
-        💬
+        {!abierto && (
+          <span aria-hidden="true" className="absolute inset-0 -z-10 animate-ping rounded-full bg-brand-red/40" />
+        )}
+        <span aria-hidden="true">{abierto ? "×" : "💬"}</span>
+        {!abierto && (
+          <span className="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-brand-yellow px-1 text-[10px] font-extrabold text-brand-dark shadow">
+            IA
+          </span>
+        )}
       </button>
     </div>
   );
 }
+
