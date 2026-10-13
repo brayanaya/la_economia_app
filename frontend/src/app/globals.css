@@ -22,3 +22,23 @@ body {
   margin: 0;
   padding: 0;
 }
+
+/* Animaciones de entrada (tesis La Economía Aya) */
+@keyframes aparecer-arriba {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes entrar-derecha {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+@keyframes fundir {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.anim-aparecer { animation: aparecer-arriba 400ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-drawer { animation: entrar-derecha 300ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-fade { animation: fundir 200ms ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  .anim-aparecer, .anim-drawer, .anim-fade { animation: none; }
+}

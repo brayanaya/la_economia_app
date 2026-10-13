@@ -12,7 +12,7 @@ type Props = {
 
 export default function Navbar({ sede, onSedeChange, cartCount = 0, onCartClick, onAccountClick }: Props) {
   return (
-    <header className="w-full">
+    <header className="sticky top-0 z-30 w-full">
       <div className="bg-brand-dark text-white text-xs">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2">
           <div className="flex items-center gap-2">
@@ -35,7 +35,7 @@ export default function Navbar({ sede, onSedeChange, cartCount = 0, onCartClick,
         </div>
       </div>
 
-      <div className="border-b-4 border-brand-yellow bg-brand-red shadow-md">
+      <div className="border-b-4 border-brand-yellow bg-brand-red/95 shadow-lg backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3">
           <a href="/" className="flex items-center gap-3 transition-opacity duration-200 hover:opacity-90">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -73,3 +73,5 @@ export default function Navbar({ sede, onSedeChange, cartCount = 0, onCartClick,
     </header>
   );
 }
+
+

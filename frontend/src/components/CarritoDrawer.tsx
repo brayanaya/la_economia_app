@@ -95,8 +95,8 @@ export default function CarritoDrawer() {
 
       {abierto && (
         <div className="fixed inset-0 z-[65]" role="dialog" aria-modal="true" aria-label="Carrito de compras">
-          <div className="absolute inset-0 bg-black/50" onClick={cerrarTodo} />
-          <aside className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-white shadow-xl">
+          <div className="anim-fade absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={cerrarTodo} />
+          <aside className="anim-drawer absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-white shadow-2xl">
             <header className="flex items-center justify-between border-b px-4 py-3">
               <h2 className="text-lg font-bold text-gray-900">Tu carrito</h2>
               <button type="button" onClick={cerrarTodo} aria-label="Cerrar carrito" className="rounded p-1 text-2xl leading-none text-gray-600 hover:bg-gray-100">
@@ -187,4 +187,6 @@ export default function CarritoDrawer() {
     </>
   );
 }
+
+
 
