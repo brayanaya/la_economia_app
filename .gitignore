@@ -26,3 +26,4 @@ docker-compose.override.yml
 # Archivos temporales de pruebas
 body.json
 .claude/
+.pytest_cache/
