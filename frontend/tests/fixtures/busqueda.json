@@ -1,0 +1,11 @@
+﻿[
+  {
+    "id": 1,
+    "nombre": "Leche Entera 1L",
+    "precio": 4500,
+    "stock_sede": 25,
+    "stock": 25,
+    "imagen": "/logo.png",
+    "sede": "Sede Centro"
+  }
+]
