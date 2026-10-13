@@ -32,6 +32,8 @@ function guardar(analiticas: boolean) {
   }
 }
 
+const enlace = "font-bold underline underline-offset-2 transition-colors duration-200 hover:text-[#5b00ed]";
+
 export default function CookieBanner() {
   const [visible, setVisible] = useState(false);
   const [animado, setAnimado] = useState(false);
@@ -73,35 +75,26 @@ export default function CookieBanner() {
     <div
       role="dialog"
       aria-label="Preferencias de cookies"
-      className={`fixed inset-x-4 bottom-4 z-[80] mx-auto max-w-3xl rounded-2xl border border-white/10 bg-brand-dark/95 p-5 text-sm text-gray-200 shadow-2xl backdrop-blur-md transition-all duration-300 ${
+      className={`fixed inset-x-4 bottom-4 z-[80] mx-auto max-w-3xl rounded-[25px] border-2 border-[#3f0791] bg-white/95 p-6 text-sm text-[#3f0791] shadow-[6px_6px_0_0_#3f0791] backdrop-blur-md transition-all duration-300 ease-out ${
         animado ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
       }`}
     >
-      <p className="font-bold text-brand-yellow">🍪 Tu privacidad importa</p>
-      <p className="mt-1 leading-relaxed text-gray-300">
+      <p className="text-xl font-black leading-none tracking-tight">🍪 Tu privacidad importa</p>
+      <p className="mt-3 leading-relaxed text-[#3f0791]/90">
         Usamos cookies y almacenamiento local funcionales para recordar tu carrito y mantener tu sesión. Tus datos
         personales se tratan conforme a la Ley 1581 de 2012 (Habeas Data). Consulta la{" "}
-        <Link href="/privacidad" className="font-medium text-brand-yellow underline underline-offset-2">
-          política de privacidad
-        </Link>
-        , los{" "}
-        <Link href="/terminos" className="font-medium text-brand-yellow underline underline-offset-2">
-          términos y condiciones
-        </Link>{" "}
-        y la{" "}
-        <Link href="/cookies" className="font-medium text-brand-yellow underline underline-offset-2">
-          política de cookies
-        </Link>
-        .
+        <Link href="/privacidad" className={enlace}>política de privacidad</Link>, los{" "}
+        <Link href="/terminos" className={enlace}>términos y condiciones</Link> y la{" "}
+        <Link href="/cookies" className={enlace}>política de cookies</Link>.
       </p>
 
       {configurando && (
-        <div className="mt-4 space-y-3 rounded-xl border border-white/10 bg-white/5 p-4">
+        <div className="mt-4 space-y-3 rounded-[18px] bg-[#dad9ff]/60 p-4">
           <label className="flex items-start gap-3 opacity-80">
-            <input type="checkbox" checked disabled className="mt-1 h-4 w-4 accent-[#FFC72C]" />
+            <input type="checkbox" checked disabled className="mt-1 h-4 w-4 accent-[#3f0791]" />
             <span>
-              <strong className="text-white">Necesarias</strong>
-              <span className="block text-xs text-gray-400">
+              <strong>Necesarias</strong>
+              <span className="block text-xs text-[#3f0791]/80">
                 Carrito, sede y registro de tu decisión. Siempre activas.
               </span>
             </span>
@@ -111,11 +104,11 @@ export default function CookieBanner() {
               type="checkbox"
               checked={analiticas}
               onChange={(e) => setAnaliticas(e.target.checked)}
-              className="mt-1 h-4 w-4 accent-[#FFC72C]"
+              className="mt-1 h-4 w-4 accent-[#3f0791]"
             />
             <span>
-              <strong className="text-white">Analíticas y mejora del servicio</strong>
-              <span className="block text-xs text-gray-400">
+              <strong>Analíticas y mejora del servicio</strong>
+              <span className="block text-xs text-[#3f0791]/80">
                 Opcionales. Nos ayudan a entender qué se busca para mejorar el catálogo.
               </span>
             </span>
@@ -123,11 +116,11 @@ export default function CookieBanner() {
         </div>
       )}
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-5 flex flex-wrap gap-2">
         <button
           type="button"
           onClick={() => decidir(true)}
-          className="rounded-xl bg-brand-yellow px-4 py-2 font-bold text-brand-dark transition-all duration-200 hover:brightness-95 active:scale-95"
+          className="rounded-[52px] border-2 border-[#3f0791] bg-[#3f0791] px-6 py-2.5 font-black text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#5b00ed] active:scale-95"
         >
           Aceptar todas
         </button>
@@ -136,14 +129,14 @@ export default function CookieBanner() {
             <button
               type="button"
               onClick={() => decidir(analiticas)}
-              className="rounded-xl border border-white/20 px-4 py-2 font-semibold text-white transition-all duration-200 hover:bg-white/10 active:scale-95"
+              className="rounded-[52px] border-2 border-[#3f0791] px-6 py-2.5 font-black text-[#3f0791] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#dad9ff] active:scale-95"
             >
               Guardar selección
             </button>
             <button
               type="button"
               onClick={() => decidir(false)}
-              className="rounded-xl px-4 py-2 font-semibold text-gray-300 transition-all duration-200 hover:text-white active:scale-95"
+              className="rounded-[52px] px-4 py-2.5 font-bold text-[#3f0791]/80 transition-all duration-200 hover:text-[#3f0791] active:scale-95"
             >
               Solo necesarias
             </button>
@@ -152,7 +145,7 @@ export default function CookieBanner() {
           <button
             type="button"
             onClick={() => setConfigurando(true)}
-            className="rounded-xl border border-white/20 px-4 py-2 font-semibold text-white transition-all duration-200 hover:bg-white/10 active:scale-95"
+            className="rounded-[52px] border-2 border-[#3f0791] px-6 py-2.5 font-black text-[#3f0791] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#dad9ff] active:scale-95"
           >
             Configurar
           </button>

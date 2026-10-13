@@ -41,14 +41,14 @@ export default function ProductoCard({ nombre, precio, imagen, sede, stock, simi
   }
 
   return (
-    <article className="group relative flex flex-col anim-aparecer rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl">
+    <article className="anim-aparecer group relative flex flex-col rounded-[25px] border-2 border-[#3f0791] bg-white p-4 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#3f0791]">
       {similitud !== undefined && (
-        <span className="absolute left-3 top-3 z-10 rounded-full bg-brand-yellow px-2 py-1 text-[11px] font-bold text-brand-dark">
+        <span className="absolute left-5 top-5 z-10 rounded-[52px] bg-[#e30ba6] px-3 py-1 text-[11px] font-black text-white">
           🎯 {Math.round(similitud * 100)}% coincidencia
         </span>
       )}
 
-      <div className="mb-3 flex h-40 items-center justify-center overflow-hidden rounded-xl bg-brand-bg">
+      <div className="mb-3 flex h-40 items-center justify-center overflow-hidden rounded-[18px] bg-[#dad9ff]">
         {imagen ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -61,10 +61,10 @@ export default function ProductoCard({ nombre, precio, imagen, sede, stock, simi
         )}
       </div>
 
-      <h3 className="line-clamp-2 min-h-10 text-sm font-semibold text-brand-dark">{nombre}</h3>
-      <p className="mt-2 text-xl font-extrabold text-brand-red">{cop.format(precio)}</p>
+      <h3 className="line-clamp-2 min-h-10 text-sm font-bold leading-snug text-[#3f0791]">{nombre}</h3>
+      <p className="mt-2 text-2xl font-black leading-none tracking-tight text-[#3f0791]">{cop.format(precio)}</p>
 
-      <p className={`mt-1 text-xs font-medium ${disponible ? "text-brand-green" : "text-brand-red"}`}>
+      <p className={`mt-2 text-xs font-bold ${disponible ? "text-emerald-700" : "text-[#e30ba6]"}`}>
         {disponible ? `● ${stock} disponibles en ${sede}` : `● Agotado en ${sede}`}
       </p>
 
@@ -72,8 +72,10 @@ export default function ProductoCard({ nombre, precio, imagen, sede, stock, simi
         type="button"
         onClick={manejarClick}
         disabled={!disponible}
-        className={`mt-3 w-full rounded-xl py-2 text-sm font-bold text-white transition-all duration-200 active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:active:scale-100 ${
-          agregado ? "bg-emerald-600" : "bg-brand-green hover:bg-brand-green-dark"
+        className={`mt-3 w-full rounded-[52px] border-2 py-2.5 text-sm font-black text-white transition-all duration-200 active:scale-95 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-300 disabled:active:scale-100 ${
+          agregado
+            ? "border-emerald-600 bg-emerald-600"
+            : "border-[#3f0791] bg-[#3f0791] hover:border-[#5b00ed] hover:bg-[#5b00ed]"
         }`}
       >
         {agregado ? "¡Agregado! ✓" : "Agregar al carrito"}
@@ -81,6 +83,3 @@ export default function ProductoCard({ nombre, precio, imagen, sede, stock, simi
     </article>
   );
 }
-
-
-
