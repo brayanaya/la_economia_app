@@ -55,7 +55,7 @@ export default function BuscadorSemantico({ cargando, onBuscar }: Props) {
             onChange={(e) => setValor(e.target.value)}
             placeholder="Busca lo que necesitas: café molido, algo para el desayuno…"
             aria-label="Buscar productos"
-            className="h-14 w-full rounded-[52px] border-2 border-[#3f0791] bg-white pl-12 pr-12 text-base font-medium text-[#3f0791] shadow-lg outline-none transition-all duration-200 placeholder:text-[#3f0791]/50 focus:ring-4 focus:ring-white/60"
+            className="h-14 w-full rounded-[52px] border-2 border-[#3f0791] bg-white pl-12 pr-12 text-base font-medium text-[#3f0791] shadow-lg outline-none transition-all duration-200 placeholder:text-[#3f0791]/70 focus:ring-4 focus:ring-white/60"
           />
           {valor && (
             <button
@@ -85,7 +85,7 @@ export default function BuscadorSemantico({ cargando, onBuscar }: Props) {
             key={s}
             type="button"
             onClick={() => usarSugerencia(s)}
-            className="rounded-[52px] border-2 border-white/70 bg-white/10 px-4 py-1 font-bold text-white backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:text-[#3f0791] active:scale-95"
+            className="rounded-[52px] border-2 border-white/70 bg-[#3f0791]/60 px-4 py-1 font-bold text-white backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:text-[#3f0791] active:scale-95"
           >
             {s}
           </button>
@@ -94,3 +94,5 @@ export default function BuscadorSemantico({ cargando, onBuscar }: Props) {
     </div>
   );
 }
+
+

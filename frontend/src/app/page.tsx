@@ -121,13 +121,13 @@ export default function Home() {
 
       <section className="bg-gradient-to-tr from-[#e30ba6] to-[#5b00ed]">
         <div className="mx-auto max-w-7xl px-4 py-14 sm:py-20">
-          <p className="mb-4 inline-block rounded-[52px] border-2 border-white/80 px-4 py-1 text-xs font-black uppercase tracking-widest text-white">
+          <p className="mb-4 inline-block rounded-[52px] border-2 border-white/80 bg-[#3f0791] px-4 py-1 text-xs font-black uppercase tracking-widest text-white">
             Neiva, Huila · {etiquetaSede}
           </p>
           <h1 className="max-w-3xl text-5xl font-black leading-none tracking-tight text-white sm:text-7xl">
             Tu mercado, a un clic.
           </h1>
-          <p className="mt-5 max-w-xl text-lg font-medium text-white/90">
+          <p className="mt-5 max-w-xl text-xl font-bold text-white">
             Cuéntanos qué necesitas y nuestra IA encuentra los productos por ti.
           </p>
           <div className="mt-8 max-w-3xl">
@@ -206,3 +206,5 @@ export default function Home() {
     </div>
   );
 }
+
+

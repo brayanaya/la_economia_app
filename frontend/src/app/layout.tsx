@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "La Economía Aya | Supermercado & Distribuciones",
-  description: "Supermercado y distribuciones en Neiva, Huila. Busca productos con IA y elige tu sede.",
+  description: "Tu mercado a un clic en Neiva, Huila.",
   icons: { icon: "/logo.png" },
 };
 
