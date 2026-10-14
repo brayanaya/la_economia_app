@@ -1,0 +1,13 @@
+﻿[
+  {
+    "id": "prod-1",
+    "nombre": "Leche Entera 1L",
+    "descripcion": "Leche de vaca entera, fresca",
+    "precio": 4500,
+    "precio_unitario": 4500,
+    "imagen_url": null,
+    "stock": 20,
+    "sede_id": "a0000000-0000-0000-0000-000000000002",
+    "categoria": "Lácteos"
+  }
+]
