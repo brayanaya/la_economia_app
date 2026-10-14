@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+// Año fijo: evita valores inestables durante el render del servidor.
 const ANIO = 2026;
 
 function Sello({ d, titulo, detalle }: { d: string; titulo: string; detalle: string }) {
@@ -59,6 +60,7 @@ export default function FooterCompliance() {
           <Link href="/terminos" className={enlace}>Términos y condiciones</Link>
           <Link href="/cookies" className={enlace}>Política de cookies</Link>
           <Link href="/pqr" className={enlace}>Canal de atención PQR</Link>
+          <Link href="/pedidos" className={enlace}>Consultar mi pedido</Link>
           <button type="button" onClick={abrirCookies} className={enlace}>Configurar cookies</button>
         </nav>
 
@@ -77,3 +79,4 @@ export default function FooterCompliance() {
     </footer>
   );
 }
+
