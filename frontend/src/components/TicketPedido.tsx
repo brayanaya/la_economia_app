@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { OrdenConsulta } from "@/lib/ordenes";
 import { nombreSede } from "@/lib/sedes";
+import BotonPagarPedido from "@/components/BotonPagarPedido";
 
 const COP = new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 });
 const FECHA = new Intl.DateTimeFormat("es-CO", {
@@ -142,6 +143,7 @@ export default function TicketPedido({ orden, nuevo }: { orden: OrdenConsulta; n
       </article>
 
       <div className="mt-6 flex flex-wrap justify-center gap-3 print:hidden">
+        <BotonPagarPedido ordenId={orden.id} estado={orden.estado} />
         <button type="button" onClick={() => window.print()} className={BOTON_SECUNDARIO}>
           Imprimir ticket
         </button>
@@ -158,3 +160,4 @@ export default function TicketPedido({ orden, nuevo }: { orden: OrdenConsulta; n
     </div>
   );
 }
+

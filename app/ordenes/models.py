@@ -1,7 +1,7 @@
-# carrito-v1
+﻿# carrito-v1
 import uuid
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, Numeric, String, func
+from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, Numeric, String, func, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -10,8 +10,10 @@ from app.core.database import Base as Base
 
 class Orden(Base):
     __tablename__ = "ordenes"
+    __table_args__ = (Index("uq_ordenes_ticket_id", "ticket_id", unique=True),)
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    ticket_id = Column(UUID(as_uuid=True), nullable=False, default=uuid.uuid4, server_default=text("gen_random_uuid()"))
     sede_id = Column(UUID(as_uuid=True), nullable=False, index=True)
     cliente_nombre = Column(String(120), nullable=False)
     cliente_telefono = Column(String(30), nullable=True)
@@ -32,6 +34,7 @@ class DetalleOrden(Base):
     __tablename__ = "detalles_orden"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    ticket_id = Column(UUID(as_uuid=True), nullable=False, default=uuid.uuid4, server_default=text("gen_random_uuid()"))
     orden_id = Column(UUID(as_uuid=True), ForeignKey("ordenes.id", ondelete="CASCADE"), nullable=False, index=True)
     producto_id = Column(String(64), nullable=False)
     nombre = Column(String(200), nullable=False)
@@ -41,3 +44,4 @@ class DetalleOrden(Base):
     subtotal = Column(Numeric(12, 2), nullable=False)
 
     orden = relationship("Orden", back_populates="items")
+

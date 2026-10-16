@@ -1,4 +1,4 @@
--- carrito-v1 : modulo ordenes (idempotente)
+﻿-- carrito-v1 : modulo ordenes (idempotente)
 CREATE TABLE IF NOT EXISTS ordenes (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     sede_id UUID NOT NULL,
@@ -7,9 +7,15 @@ CREATE TABLE IF NOT EXISTS ordenes (
     notas VARCHAR(500),
     total NUMERIC(12,2) NOT NULL,
     estado VARCHAR(20) NOT NULL DEFAULT 'pendiente',
+    ticket_id UUID NOT NULL DEFAULT gen_random_uuid(),
     creado_en TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS ix_ordenes_sede_id ON ordenes (sede_id);
+ALTER TABLE ordenes ADD COLUMN IF NOT EXISTS ticket_id UUID;
+UPDATE ordenes SET ticket_id = gen_random_uuid() WHERE ticket_id IS NULL;
+ALTER TABLE ordenes ALTER COLUMN ticket_id SET DEFAULT gen_random_uuid();
+ALTER TABLE ordenes ALTER COLUMN ticket_id SET NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_ordenes_ticket_id ON ordenes (ticket_id);
 
 CREATE TABLE IF NOT EXISTS detalles_orden (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -187,3 +187,40 @@ async def sincronizar_inventario(
         productos_actualizados=productos_actualizados,
         conflictos=conflictos,
     )
+
+# --- NUEVO ENDPOINT: Reserva Atómica (Prevención Race Conditions) ---
+from pydantic import BaseModel
+import uuid
+
+class ReservaRequest(BaseModel):
+    producto_id: uuid.UUID
+    sede_id: uuid.UUID
+    cantidad: int
+
+@router.post("/reservar", summary="Reserva atómica de stock")
+async def reservar_stock(payload: ReservaRequest, db: AsyncSession = Depends(get_db)):
+    from sqlalchemy import select
+    from fastapi import HTTPException
+    from app.models.inventario import InventarioSede
+    
+    # Bloqueo pesimista: .with_for_update() bloquea la fila hasta que termine la transacción
+    stmt = select(InventarioSede).where(
+        InventarioSede.producto_id == payload.producto_id,
+        InventarioSede.sede_id == payload.sede_id
+    ).with_for_update()
+    
+    resultado = await db.execute(stmt)
+    inventario = resultado.scalar_one_or_none()
+    
+    if not inventario:
+        raise HTTPException(status_code=404, detail="Inventario no encontrado en esta sede")
+        
+    stock_disponible = inventario.stock_actual - inventario.stock_reservado
+    
+    if stock_disponible < payload.cantidad:
+        raise HTTPException(status_code=409, detail="Stock insuficiente o actualmente reservado por otro usuario")
+        
+    inventario.stock_reservado += payload.cantidad
+    await db.commit()
+    
+    return {"mensaje": "Stock reservado exitosamente", "cantidad_reservada": payload.cantidad}

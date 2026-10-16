@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+﻿from fastapi import APIRouter, Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -101,9 +101,9 @@ async def _aplicar_filtro_hibrido(
                 InventarioSede.sede_id == sede_id,
             )
             inventario = (await db.execute(inv_stmt)).scalar_one_or_none()
-            if inventario is None or inventario.stock_actual <= 0:
+            if inventario is None or (inventario.stock_actual - inventario.stock_reservado) <= 0:
                 continue  # descartado por el filtro híbrido de disponibilidad
-            stock_sede = inventario.stock_actual
+            stock_sede = inventario.stock_actual - inventario.stock_reservado
 
         resultados.append(
             ProductoRecuperado(
@@ -117,3 +117,4 @@ async def _aplicar_filtro_hibrido(
         )
 
     return resultados
+

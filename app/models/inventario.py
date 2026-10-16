@@ -1,4 +1,4 @@
-import uuid
+﻿import uuid
 from datetime import datetime
 
 from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Integer, UniqueConstraint, func
@@ -14,6 +14,8 @@ class InventarioSede(Base):
         UniqueConstraint("producto_id", "sede_id", name="uq_producto_sede"),
         CheckConstraint("stock_actual >= 0", name="ck_stock_actual_no_negativo"),
         CheckConstraint("stock_minimo >= 0", name="ck_stock_minimo_no_negativo"),
+        CheckConstraint("stock_reservado >= 0", name="ck_stock_reserv_no_negativo"),
+        CheckConstraint("stock_actual >= stock_reservado", name="ck_stock_coherente"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -35,4 +37,5 @@ class InventarioSede(Base):
     sede: Mapped["Sede"] = relationship(back_populates="inventarios")
 
     def __repr__(self) -> str:
-        return f"<InventarioSede producto={self.producto_id} sede={self.sede_id} stock={self.stock_actual}>"
+        return f"<InventarioSede producto={self.producto_id} sede={self.sede_id} stock={self.stock_actual} reservado={self.stock_reservado}>"
+
