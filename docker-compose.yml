@@ -5,17 +5,17 @@ services:
     image: pgvector/pgvector:pg16
     container_name: la_economia_postgres
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-la_economia_db}
       POSTGRES_USER: ${POSTGRES_USER:-la_economia_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-la_economia_pass_dev}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - la_economia_pgdata:/var/lib/postgresql/data/pgdata
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-      - ./db/seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
@@ -44,6 +44,7 @@ services:
       - la_economia_net
     volumes:
       - ./app:/code/app  # hot-reload en desarrollo local
+      - ./alembic:/code/alembic
 
 volumes:
   la_economia_pgdata:

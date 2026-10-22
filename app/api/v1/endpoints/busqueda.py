@@ -22,7 +22,7 @@ async def _buscar_candidatos(
 ) -> list[tuple[EmbeddingProducto, float]]:
     """
     Ejecuta la búsqueda por similitud coseno usando el operador `<=>` de
-    pgvector sobre el índice HNSW de embeddings_productos (numeral 10.3).
+    pgvector sobre el indice HNSW de embeddings_productos (numeral 10.3).
     """
     distancia = EmbeddingProducto.embedding.cosine_distance(vector_consulta)
     stmt = (
@@ -38,15 +38,15 @@ async def _buscar_candidatos(
 @router.post(
     "/semantica",
     response_model=BusquedaSemanticaResponse,
-    summary="Retriever RAG: búsqueda semántica + filtro híbrido por stock/sede",
+    summary="Retriever RAG: búsqueda semántica + filtro hibrido por stock/sede",
 )
 async def busqueda_semantica(
     payload: BusquedaSemanticaRequest, db: AsyncSession = Depends(get_db)
 ) -> BusquedaSemanticaResponse:
     """
     Implementa el flujo del retriever descrito en el numeral 10.3 del
-    documento de arquitectura: (1) recuperación semántica amplia sobre el
-    índice HNSW, (2) filtro híbrido de disponibilidad por sede activa, y
+    documento de arquitectura: (1) recuperacion semántica amplia sobre el
+    indice HNSW, (2) filtro hibrido de disponibilidad por sede activa, y
     (3) fallback ampliando k si el filtro deja menos de dos candidatos.
     """
     vector_consulta = await get_embedding(payload.consulta)
@@ -56,8 +56,8 @@ async def busqueda_semantica(
 
     resultados = await _aplicar_filtro_hibrido(db, candidatos, payload.sede_id)
 
-    # Fallback: si el filtro híbrido deja menos de 2 candidatos disponibles,
-    # se amplía la búsqueda inicial a k=16 antes de responder al cliente.
+    # Fallback: si el filtro hibrido deja menos de 2 candidatos disponibles,
+    # se amplia la búsqueda inicial a k=16 antes de responder al cliente.
     if payload.sede_id is not None and len(resultados) < 2 and payload.top_k < 16:
         candidatos_ampliados = True
         candidatos = await _buscar_candidatos(db, vector_consulta, 16)
@@ -102,7 +102,7 @@ async def _aplicar_filtro_hibrido(
             )
             inventario = (await db.execute(inv_stmt)).scalar_one_or_none()
             if inventario is None or (inventario.stock_actual - inventario.stock_reservado) <= 0:
-                continue  # descartado por el filtro híbrido de disponibilidad
+                continue  # descartado por el filtro hibrido de disponibilidad
             stock_sede = inventario.stock_actual - inventario.stock_reservado
 
         resultados.append(

@@ -1,4 +1,4 @@
-﻿from urllib.parse import quote_plus
+from urllib.parse import quote_plus
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 

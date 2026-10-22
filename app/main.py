@@ -1,10 +1,10 @@
-"""
-Punto de entrada de la aplicación FastAPI — La Economía Aya API.
+﻿"""
+Punto de entrada de la aplicacion FastAPI â€” La Economi­a Aya API.
 
-Ejecución local:
+Ejecucion local:
     uvicorn app.main:app --reload --port 8000
 
-Documentación interactiva generada automáticamente por FastAPI:
+Documentacion interactiva generada automi¡ticamente por FastAPI:
     http://localhost:8000/docs      (Swagger UI)
     http://localhost:8000/redoc     (ReDoc)
 """
@@ -20,10 +20,10 @@ app = FastAPI(
     version=settings.app_version,
     description=(
         "API del backend de negocio (monolito modular) del Supermercado "
-        "La Economía Aya — sedes Santa Isabel y Machines, Neiva, Huila. "
-        "Expone el catálogo unificado, la comparativa de inventario "
-        "multisede, el endpoint de sincronización con Siigo y el "
-        "retriever semántico del pipeline RAG del agente de IA."
+        "La Economi­a Aya â€” sedes Santa Isabel y Machines, Neiva, Huila. "
+        "Expone el cati¡logo unificado, la comparativa de inventario "
+        "multisede, el endpoint de sincronizacion con Siigo y el "
+        "retriever semi¡ntico del pipeline RAG del agente de IA."
     ),
     debug=settings.debug,
 )

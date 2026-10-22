@@ -1,4 +1,4 @@
-import asyncio
+﻿import asyncio
 
 from sqlalchemy import select
 
@@ -11,27 +11,27 @@ from app.models.sede import Sede
 from app.services.embeddings import get_embedding
 
 SEED_CATEGORIAS = [
-    {"nombre": "Café y Desayuno", "descripcion": "Café molido, soluble, chocolate y cereales"},
+    {"nombre": "Cafi© y Desayuno", "descripcion": "Cafi© molido, soluble, chocolate y cereales"},
 ]
 
 SEED_PRODUCTOS = [
     {
         "codigo_barras": "7702001006006",
-        "nombre": "Café Sello Rojo Molido 500g",
-        "descripcion": "Café tostado y molido de molienda media, aroma intenso y sabor tradicional colombiano.",
+        "nombre": "Cafi© Sello Rojo Molido 500g",
+        "descripcion": "Cafi© tostado y molido de molienda media, aroma intenso y sabor tradicional colombiano.",
         "precio_venta": 18500.00,
         "es_saludable": False,
-        "categoria": "Café y Desayuno",
+        "categoria": "Cafi© y Desayuno",
         "stock_santa_isabel": 45,
         "stock_machines": 30,
     },
     {
         "codigo_barras": "7702001007007",
-        "nombre": "Café Águila Roja 250g",
-        "descripcion": "Café molido tradicional de excelente aroma y cuerpo.",
+        "nombre": "Cafi© iguila Roja 250g",
+        "descripcion": "Cafi© molido tradicional de excelente aroma y cuerpo.",
         "precio_venta": 9800.00,
         "es_saludable": False,
-        "categoria": "Café y Desayuno",
+        "categoria": "Cafi© y Desayuno",
         "stock_santa_isabel": 60,
         "stock_machines": 50,
     },
@@ -41,7 +41,7 @@ SEED_PRODUCTOS = [
         "descripcion": "Chocolate para mesa tradicional con clavo y canela.",
         "precio_venta": 8900.00,
         "es_saludable": False,
-        "categoria": "Café y Desayuno",
+        "categoria": "Cafi© y Desayuno",
         "stock_santa_isabel": 50,
         "stock_machines": 40,
     },

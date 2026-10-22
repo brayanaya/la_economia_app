@@ -1,4 +1,4 @@
-import uuid
+﻿import uuid
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -95,7 +95,7 @@ async def ajustar_stock_manual(
 @router.post(
     "/middleware/sincronizar-inventario",
     response_model=SincronizacionInventarioResponse,
-    summary="Webhook/polling de sincronización con Siigo (RF-05, RF-08)",
+    summary="Webhook/polling de sincronizacion con Siigo (RF-05, RF-08)",
 )
 async def sincronizar_inventario(
     payload: SincronizacionInventarioRequest, db: AsyncSession = Depends(get_db)
@@ -103,17 +103,17 @@ async def sincronizar_inventario(
     """
     Punto de entrada del middleware descrito en el Flujo B del documento
     de arquitectura. Este endpoint es interno (no expuesto al cliente
-    final) y debe protegerse en producción mediante un token de servicio
+    final) y debe protegerse en produccion mediante un token de servicio
     de alcance restringido (scope: middleware:write), conforme al
     requerimiento RNF-04.
     """
-    # 1. Registrar el evento crudo en la cola de auditoría/reintentos,
-    #    ANTES de intentar procesarlo, para no perder información ante
-    #    un fallo a mitad de la sincronización (patrón outbox simplificado).
+    # 1. Registrar el evento crudo en la cola de auditori­a/reintentos,
+    #    ANTES de intentar procesarlo, para no perder informacion ante
+    #    un fallo a mitad de la sincronizacion (patron outbox simplificado).
     sede_stmt = select(Sede).where(Sede.nombre == payload.codigo_siigo_sede)
-    # NOTA: en producción, la correspondencia sede <-> código Siigo debe
+    # NOTA: en produccion, la correspondencia sede <-> codigo Siigo debe
     # resolverse mediante una columna dedicada (p. ej. sedes.codigo_siigo);
-    # aquí se resuelve por nombre como simplificación de esta primera fase.
+    # aqui­ se resuelve por nombre como simplificacion de esta primera fase.
     sede = (await db.execute(sede_stmt)).scalar_one_or_none()
 
     transaccion = TransaccionSiigo(
@@ -128,13 +128,13 @@ async def sincronizar_inventario(
         await db.commit()
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Sede no reconocida para código Siigo: {payload.codigo_siigo_sede}",
+            detail=f"Sede no reconocida para codigo Siigo: {payload.codigo_siigo_sede}",
         )
 
     db.add(transaccion)
-    await db.flush()  # asigna transaccion.id sin cerrar la transacción SQL
+    await db.flush()  # asigna transaccion.id sin cerrar la transaccion SQL
 
-    # 2. Procesar cada producto del payload contra el catálogo unificado.
+    # 2. Procesar cada producto del payload contra el cati¡logo unificado.
     productos_actualizados = 0
     conflictos: list[ConflictoSincronizacion] = []
 
@@ -158,8 +158,8 @@ async def sincronizar_inventario(
         inventario = (await db.execute(inv_stmt)).scalar_one_or_none()
 
         if inventario is None:
-            # Alta automática del registro de inventario si el producto
-            # nunca se había vendido antes en esta sede.
+            # Alta automi¡tica del registro de inventario si el producto
+            # nunca se habi­a vendido antes en esta sede.
             inventario = InventarioSede(
                 producto_id=producto.id, sede_id=sede.id, stock_actual=0, stock_minimo=0
             )
@@ -169,7 +169,7 @@ async def sincronizar_inventario(
         producto.precio_venta = item.precio  # el precio es global al producto en este esquema
         productos_actualizados += 1
 
-    # 3. Cerrar el ciclo de vida de la transacción de sincronización.
+    # 3. Cerrar el ciclo de vida de la transaccion de sincronizacion.
     transaccion.procesado_en = datetime.now(timezone.utc)
     transaccion.estado = (
         EstadoTransaccionSiigo.PROCESADO.value
@@ -188,7 +188,7 @@ async def sincronizar_inventario(
         conflictos=conflictos,
     )
 
-# --- NUEVO ENDPOINT: Reserva Atómica (Prevención Race Conditions) ---
+# --- NUEVO ENDPOINT: Reserva Atomica (Prevencion Race Conditions) ---
 from pydantic import BaseModel
 import uuid
 
@@ -197,13 +197,13 @@ class ReservaRequest(BaseModel):
     sede_id: uuid.UUID
     cantidad: int
 
-@router.post("/reservar", summary="Reserva atómica de stock")
+@router.post("/reservar", summary="Reserva atomica de stock")
 async def reservar_stock(payload: ReservaRequest, db: AsyncSession = Depends(get_db)):
     from sqlalchemy import select
     from fastapi import HTTPException
     from app.models.inventario import InventarioSede
     
-    # Bloqueo pesimista: .with_for_update() bloquea la fila hasta que termine la transacción
+    # Bloqueo pesimista: .with_for_update() bloquea la fila hasta que termine la transaccion
     stmt = select(InventarioSede).where(
         InventarioSede.producto_id == payload.producto_id,
         InventarioSede.sede_id == payload.sede_id

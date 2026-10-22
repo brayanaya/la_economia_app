@@ -1,4 +1,4 @@
-import uuid
+﻿import uuid
 from decimal import Decimal
 
 from pydantic import BaseModel, Field
@@ -6,13 +6,13 @@ from pydantic import BaseModel, Field
 
 class BusquedaSemanticaRequest(BaseModel):
     """
-    Cuerpo de la solicitud de búsqueda semántica, utilizada tanto por el
+    Cuerpo de la solicitud de biºsqueda semi¡ntica, utilizada tanto por el
     agente de IA (retriever del pipeline RAG) como, potencialmente, por un
-    buscador enriquecido en el catálogo del cliente.
+    buscador enriquecido en el cati¡logo del cliente.
     """
     consulta: str = Field(..., min_length=2, max_length=500)
     sede_id: uuid.UUID | None = Field(
-        default=None, description="Si se especifica, aplica el filtro híbrido de stock > 0 en esa sede."
+        default=None, description="Si se especifica, aplica el filtro hi­brido de stock > 0 en esa sede."
     )
     top_k: int = Field(default=8, ge=1, le=20)
     limite_resultados: int = Field(default=4, ge=1, le=10)
@@ -32,5 +32,5 @@ class BusquedaSemanticaResponse(BaseModel):
     resultados: list[ProductoRecuperado]
     candidatos_ampliados: bool = Field(
         default=False,
-        description="True si se activó el fallback k=16 por escasez de candidatos disponibles (numeral 10.3).",
+        description="True si se activo el fallback k=16 por escasez de candidatos disponibles (numeral 10.3).",
     )

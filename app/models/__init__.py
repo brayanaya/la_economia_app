@@ -1,5 +1,5 @@
-"""
-Este módulo importa todos los modelos ORM en un único punto, de manera
+﻿"""
+Este modulo importa todos los modelos ORM en un iºnico punto, de manera
 que Base.metadata los registre correctamente y Alembic pueda detectarlos
 durante `alembic revision --autogenerate`.
 """

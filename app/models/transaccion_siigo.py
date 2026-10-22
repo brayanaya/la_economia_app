@@ -1,4 +1,4 @@
-import enum
+﻿import enum
 import uuid
 from datetime import datetime
 
@@ -17,10 +17,10 @@ class EstadoTransaccionSiigo(str, enum.Enum):
 
 class TransaccionSiigo(Base):
     """
-    Cola de sincronización consumida por el middleware de integración con
+    Cola de sincronizacion consumida por el middleware de integracion con
     Siigo (ver documento de arquitectura, Flujo B). Cada fila representa
-    un evento de actualización de inventario/facturación pendiente de
-    propagar hacia el catálogo unificado.
+    un evento de actualizacion de inventario/facturacion pendiente de
+    propagar hacia el cati¡logo unificado.
     """
     __tablename__ = "transacciones_siigo"
 

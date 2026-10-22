@@ -1,13 +1,13 @@
-"""esquema inicial: sedes, categorias, productos, inventario_sedes,
+﻿"""esquema inicial: sedes, categorias, productos, inventario_sedes,
 embeddings_productos, transacciones_siigo
 
 Revision ID: 0001
 Revises:
 Create Date: 2026-09-19
 
-Nota: esta migración baseline replica exactamente el esquema definido en
+Nota: esta migracion baseline replica exactamente el esquema definido en
 db/init.sql, de manera que un entorno provisto mediante Docker (que ya
-ejecutó init.sql en la inicialización del volumen) y un entorno gestionado
+ejecuto init.sql en la inicializacion del volumen) y un entorno gestionado
 mediante `alembic upgrade head` converjan al mismo estado de esquema.
 """
 from typing import Sequence, Union

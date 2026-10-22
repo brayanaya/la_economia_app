@@ -1,12 +1,12 @@
-"""
-Script de ingesta del catálogo hacia embeddings_productos.
+﻿"""
+Script de ingesta del cati¡logo hacia embeddings_productos.
 
 Recorre todos los productos activos, construye su texto fuente (plantilla
 del numeral 10.2) y genera su embedding mediante el proveedor configurado
-en EMBEDDING_PROVIDER, insertándolo (o actualizándolo) en la tabla
+en EMBEDDING_PROVIDER, inserti¡ndolo (o actualizi¡ndolo) en la tabla
 embeddings_productos.
 
-Ejecución local (con el entorno virtual activado):
+Ejecucion local (con el entorno virtual activado):
     python -m app.scripts_ingesta_catalogo
 
 Este script es idempotente: si un producto ya tiene un embedding vigente,
@@ -36,7 +36,7 @@ async def ingestar_catalogo() -> None:
 
             contenido = construir_contenido_fuente(
                 nombre=producto.nombre,
-                categoria=categoria.nombre if categoria else "Sin categoría",
+                categoria=categoria.nombre if categoria else "Sin categori­a",
                 etiquetas=etiquetas,
                 descripcion=producto.descripcion,
             )
@@ -44,7 +44,7 @@ async def ingestar_catalogo() -> None:
             vector = await get_embedding(contenido, tipo="document")
 
             # Reemplaza cualquier embedding previo del mismo producto
-            # (reindexación incremental ante alta/modificación, RF-09).
+            # (reindexacion incremental ante alta/modificacion, RF-09).
             await db.execute(
                 delete(EmbeddingProducto).where(EmbeddingProducto.producto_id == producto.id)
             )
@@ -55,7 +55,7 @@ async def ingestar_catalogo() -> None:
                     embedding=vector,
                 )
             )
-            print(f"  ✓ Indexado: {producto.nombre}")
+            print(f"  âœ“ Indexado: {producto.nombre}")
 
         await db.commit()
         print("Ingesta completada.")

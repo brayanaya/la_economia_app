@@ -1,5 +1,5 @@
-"""
-Servicio de generación de embeddings para el pipeline RAG (numeral 10 del
+﻿"""
+Servicio de generacion de embeddings para el pipeline RAG (numeral 10 del
 documento de arquitectura). Soporta tres proveedores intercambiables,
 seleccionados mediante la variable de entorno EMBEDDING_PROVIDER:
 
@@ -7,18 +7,18 @@ seleccionados mediante la variable de entorno EMBEDDING_PROVIDER:
   defecto `nomic-embed-text`, 768 dimensiones nativas). No requiere torch,
   por lo que evita bloqueos de DLL en Windows.
 - "openai": usa el modelo text-embedding-3-small de OpenAI, invocado con
-  el parámetro `dimensions=768` para producir vectores compatibles con la
+  el pari¡metro `dimensions=768` para producir vectores compatibles con la
   columna `embedding vector(768)` de la tabla embeddings_productos.
-- "sentence_transformers": usa un modelo local multilingüe (por defecto
-  `paraphrase-multilingual-mpnet-base-v2`, 768 dimensiones), útil cuando
-  torch está disponible en el equipo.
+- "sentence_transformers": usa un modelo local multilingi¼e (por defecto
+  `paraphrase-multilingual-mpnet-base-v2`, 768 dimensiones), iºtil cuando
+  torch esti¡ disponible en el equipo.
 
-Todos exponen la misma interfaz asíncrona `get_embedding`, de manera que el
-resto de la aplicación (retriever, ingesta de catálogo) es agnóstica al
+Todos exponen la misma interfaz asi­ncrona `get_embedding`, de manera que el
+resto de la aplicacion (retriever, ingesta de cati¡logo) es agnostica al
 proveedor configurado.
 
-IMPORTANTE: los vectores de modelos distintos NO son comparables entre sí.
-Al cambiar de proveedor hay que regenerar todos los embeddings del catálogo.
+IMPORTANTE: los vectores de modelos distintos NO son comparables entre si­.
+Al cambiar de proveedor hay que regenerar todos los embeddings del cati¡logo.
 """
 from __future__ import annotations
 
@@ -60,7 +60,7 @@ class OllamaEmbeddingProvider:
         for vector in vectores:
             if len(vector) != self._dimensions:
                 raise RuntimeError(
-                    f"El modelo '{self._model}' devolvió {len(vector)} dimensiones, "
+                    f"El modelo '{self._model}' devolvio {len(vector)} dimensiones, "
                     f"pero la columna vector({self._dimensions}) espera {self._dimensions}."
                 )
         return vectores
@@ -107,7 +107,7 @@ class SentenceTransformersEmbeddingProvider:
         return resultado[0]
 
     async def embed_batch(self, textos: list[str]) -> list[list[float]]:
-        # SentenceTransformer.encode es una llamada síncrona y bloqueante
+        # SentenceTransformer.encode es una llamada si­ncrona y bloqueante
         # (usa CPU/GPU intensivamente); se delega a un hilo aparte para no
         # bloquear el event loop de FastAPI.
         loop = asyncio.get_running_loop()
@@ -123,7 +123,7 @@ class SentenceTransformersEmbeddingProvider:
 
 @functools.lru_cache
 def get_embedding_provider() -> EmbeddingProvider:
-    """Fábrica cacheada del proveedor de embeddings configurado."""
+    """Fi¡brica cacheada del proveedor de embeddings configurado."""
     proveedor = settings.embedding_provider
 
     if proveedor == "openai":
@@ -163,7 +163,7 @@ def _aplicar_prefijo(texto: str, tipo: str) -> str:
 async def get_embedding(
     texto: str, tipo: Literal["query", "document"] = "query"
 ) -> list[float]:
-    """Punto de entrada único usado por los endpoints y por el retriever."""
+    """Punto de entrada iºnico usado por los endpoints y por el retriever."""
     provider = get_embedding_provider()
     return await provider.embed(_aplicar_prefijo(texto, tipo))
 
@@ -172,14 +172,14 @@ def construir_contenido_fuente(
     nombre: str, categoria: str, etiquetas: list[str] | None, descripcion: str | None
 ) -> str:
     """
-    Plantilla de construcción del texto fuente para el embedding de un
+    Plantilla de construccion del texto fuente para el embedding de un
     producto, conforme al numeral 10.2 del documento de arquitectura.
-    Deliberadamente NO incluye stock ni precio (atributos volátiles).
+    Deliberadamente NO incluye stock ni precio (atributos voli¡tiles).
     """
     etiquetas_texto = ", ".join(etiquetas) if etiquetas else "sin etiquetas"
     return (
         f"Producto: {nombre}\n"
-        f"Categoría: {categoria}\n"
+        f"Categori­a: {categoria}\n"
         f"Etiquetas: {etiquetas_texto}\n"
-        f"Descripción: {descripcion or 'sin descripción adicional'}"
+        f"Descripcion: {descripcion or 'sin descripcion adicional'}"
     )

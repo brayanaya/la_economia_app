@@ -1,4 +1,4 @@
-import uuid
+﻿import uuid
 from datetime import datetime
 from decimal import Decimal
 
@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class InventarioComparativaItem(BaseModel):
-    """Un renglón de la comparativa de stock por sede (vista de detalle UX)."""
+    """Un renglon de la comparativa de stock por sede (vista de detalle UX)."""
     model_config = ConfigDict(from_attributes=True)
 
     sede_id: uuid.UUID
@@ -30,7 +30,7 @@ class InventarioAjusteManual(BaseModel):
 
 
 class SincronizacionProductoItem(BaseModel):
-    """Un producto dentro del payload de sincronización de Siigo (RF-05/RF-08)."""
+    """Un producto dentro del payload de sincronizacion de Siigo (RF-05/RF-08)."""
     codigo_barras: str
     stock: int = Field(..., ge=0)
     precio: Decimal = Field(..., ge=0)

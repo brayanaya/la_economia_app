@@ -1,4 +1,4 @@
-import uuid
+﻿import uuid
 from datetime import datetime
 
 from pgvector.sqlalchemy import Vector
@@ -20,9 +20,9 @@ class EmbeddingProducto(Base):
         UUID(as_uuid=True), ForeignKey("productos.id", ondelete="CASCADE"), nullable=False
     )
     contenido_textual: Mapped[str] = mapped_column(Text, nullable=False)
-    # Dimensión fija en 768 para ser compatible tanto con modelos de
-    # Sentence-Transformers multilingües como con OpenAI text-embedding-3-small
-    # invocado con el parámetro dimensions=768 (ver app/services/embeddings.py).
+    # Dimension fija en 768 para ser compatible tanto con modelos de
+    # Sentence-Transformers multilingi¼es como con OpenAI text-embedding-3-small
+    # invocado con el pari¡metro dimensions=768 (ver app/services/embeddings.py).
     embedding: Mapped[list[float]] = mapped_column(Vector(settings.embedding_dimensions))
     creado_en: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()

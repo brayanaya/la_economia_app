@@ -1,4 +1,4 @@
-import math
+﻿import math
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -22,11 +22,11 @@ router = APIRouter(prefix="/productos", tags=["Productos"])
 
 
 def _to_producto_read(producto: Producto) -> ProductoRead:
-    # Nota de esquema: en este modelo el precio es único por producto
-    # (columna productos.precio_venta) y NO varía por sede; solo el stock
+    # Nota de esquema: en este modelo el precio es iºnico por producto
+    # (columna productos.precio_venta) y NO vari­a por sede; solo el stock
     # es propio de cada sede (tabla inventario_sedes). Si en una fase
     # posterior el negocio requiere precios diferenciados por sede, el
-    # campo `precio` debería trasladarse a inventario_sedes.
+    # campo `precio` deberi­a trasladarse a inventario_sedes.
     disponibilidad = [
         DisponibilidadSede(
             sede_id=inv.sede_id,
@@ -50,7 +50,7 @@ def _to_producto_read(producto: Producto) -> ProductoRead:
     )
 
 
-@router.get("", response_model=ProductoListResponse, summary="Listar catálogo (RF-01)")
+@router.get("", response_model=ProductoListResponse, summary="Listar cati¡logo (RF-01)")
 async def listar_productos(
     sede_id: uuid.UUID | None = Query(default=None, description="Filtra disponibilidad por sede"),
     categoria_id: uuid.UUID | None = Query(default=None),
@@ -59,8 +59,8 @@ async def listar_productos(
     db: AsyncSession = Depends(get_db),
 ) -> ProductoListResponse:
     """
-    Retorna el catálogo unificado, filtrable por sede y categoría, con
-    paginación. Contrato equivalente al especificado para
+    Retorna el cati¡logo unificado, filtrable por sede y categori­a, con
+    paginacion. Contrato equivalente al especificado para
     GET /api/v1/productos en el documento de arquitectura.
     """
     stmt = (
@@ -128,7 +128,7 @@ async def crear_producto(
 ) -> ProductoRead:
     categoria = await db.get(Categoria, payload.categoria_id)
     if categoria is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Categoría inexistente")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Categori­a inexistente")
 
     existente = await db.execute(
         select(Producto).where(Producto.codigo_barras == payload.codigo_barras)
@@ -136,7 +136,7 @@ async def crear_producto(
     if existente.scalar_one_or_none() is not None:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Ya existe un producto con ese código de barras",
+            detail="Ya existe un producto con ese codigo de barras",
         )
 
     producto = Producto(**payload.model_dump())

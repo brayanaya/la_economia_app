@@ -1,11 +1,11 @@
-import uuid
+﻿import uuid
 from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, Field
 
 
 class DisponibilidadSede(BaseModel):
-    """Disponibilidad de un producto en una sede específica (RF-06)."""
+    """Disponibilidad de un producto en una sede especi­fica (RF-06)."""
     model_config = ConfigDict(from_attributes=True)
 
     sede_id: uuid.UUID
@@ -25,7 +25,7 @@ class ProductoBase(BaseModel):
 
 
 class ProductoCreate(ProductoBase):
-    """Payload para RF-09 (gestión administrativa del catálogo)."""
+    """Payload para RF-09 (gestion administrativa del cati¡logo)."""
     pass
 
 
@@ -47,7 +47,7 @@ class ProductoRead(ProductoBase):
 
 
 class ProductoListResponse(BaseModel):
-    """Envoltorio de paginación para GET /api/v1/productos (RF-01)."""
+    """Envoltorio de paginacion para GET /api/v1/productos (RF-01)."""
     datos: list[ProductoRead]
     pagina: int
     limite: int
