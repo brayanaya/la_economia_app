@@ -13,6 +13,55 @@ export const SEDES: Sede[] = [
   { nombre: "Machines", id: "a0000000-0000-0000-0000-000000000002" },
 ];
 
+// Admin types
+export type VentasResumen = {
+  total_ingresos: number;
+  ordenes_pagadas: number;
+  periodo_dias: number;
+};
+
+export type ProductoStockBajo = {
+  producto_id: string;
+  producto_nombre: string;
+  codigo_barras: string;
+  sede_id: string;
+  sede_nombre: string;
+  stock_actual: number;
+  stock_minimo: number;
+  stock_reservado: number;
+  disponible: number;
+};
+
+export type InventarioEstado = {
+  productos_bajo_stock: ProductoStockBajo[];
+  total_productos_bajo_stock: number;
+};
+
+export type MetricasIA = {
+  busquedas_semanticas: number;
+  interacciones_agente: number;
+  embeddings_productos: number;
+  periodo_dias: number;
+};
+
+export type EstadisticasAdmin = {
+  ventas: VentasResumen;
+  inventario: InventarioEstado;
+  ia: MetricasIA;
+};
+
+export type OrdenReciente = {
+  id: string;
+  ticket_id: string;
+  sede_id: string;
+  sede_nombre: string;
+  cliente_nombre: string;
+  total: number;
+  estado: string;
+  creado_en: string | null;
+  items_count: number;
+};
+
 export type Producto = {
   id: string | number;
   nombre: string;
@@ -105,4 +154,25 @@ export async function registrarConsentimiento(
   } catch {
     return false;
   }
+}
+
+async function get(path: string): Promise<unknown> {
+  const res = await fetch(`${BASE}${path}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+export async function obtenerEstadisticasAdmin(
+  periodoDias = 30
+): Promise<EstadisticasAdmin> {
+  return (await get(`/admin/estadisticas?periodo_dias=${periodoDias}`)) as EstadisticasAdmin;
+}
+
+export async function obtenerOrdenesRecientes(
+  limite = 10
+): Promise<OrdenReciente[]> {
+  return (await get(`/admin/ordenes-recientes?limite=${limite}`)) as OrdenReciente[];
 }
