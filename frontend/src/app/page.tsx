@@ -92,7 +92,7 @@ export default function Home() {
             Cuéntanos qué necesitas y nuestra IA encuentra los productos por ti.
           </p>
           <div className="mt-8 max-w-3xl">
-            <BuscadorSemantico cargando={cargando} onBuscar={(q) => setConsulta(q.trim() || CONSULTA_INICIAL)} />
+            <BuscadorSemantico cargando={cargando} onBuscar={(q) => setConsulta(q.trim() || CONSULTA_INICIAL)} sedeId={sede.id} />
           </div>
         </div>
       </section>

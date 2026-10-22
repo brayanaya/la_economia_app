@@ -5,6 +5,8 @@ import { chatear, type Producto } from "@/lib/api";
 import { useCarrito } from "@/context/CarritoContext";
 import { mostrarAviso } from "@/lib/aviso";
 
+const CLAVE_CONSENTIMIENTO_IA = "la_economia_ia_consent_v1";
+
 type Mensaje = { rol: "usuario" | "asistente"; texto: string; productos?: Producto[] };
 
 type Props = {
@@ -14,16 +16,48 @@ type Props = {
 
 const cop = new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 });
 
+const TEXTO_HABEAS_DATA = "En cumplimiento de la Ley 1581 de 2011 (Habeas Data), autorizo a La Economía Aya para el tratamiento de mis datos personales en esta interacción con la IA.";
+
+function leerConsentimiento(): boolean {
+  try {
+    const raw = window.localStorage.getItem(CLAVE_CONSENTIMIENTO_IA);
+    return raw === "true";
+  } catch {
+    return false;
+  }
+}
+
+function guardarConsentimiento(valor: boolean) {
+  try {
+    window.localStorage.setItem(CLAVE_CONSENTIMIENTO_IA, String(valor));
+  } catch {
+    /* almacenamiento no disponible */
+  }
+}
+
 export default function ChatAgente({ sedeId, onAgregar }: Props) {
   const { agregar } = useCarrito();
   const [abierto, setAbierto] = useState(false);
   const [input, setInput] = useState("");
   const [cargando, setCargando] = useState(false);
   const [agregadoKey, setAgregadoKey] = useState<string | null>(null);
+  const [consentimiento, setConsentimiento] = useState(false);
+  const [mostrarConsentimiento, setMostrarConsentimiento] = useState(false);
   const temporizador = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [mensajes, setMensajes] = useState<Mensaje[]>([
     { rol: "asistente", texto: "¡Hola! Soy tu asistente de compras. Cuéntame qué necesitas y te recomiendo productos." },
   ]);
+
+  useEffect(() => {
+    const consentido = leerConsentimiento();
+    setConsentimiento(consentido);
+  }, []);
+
+  useEffect(() => {
+    if (abierto && !leerConsentimiento()) {
+      setMostrarConsentimiento(true);
+    }
+  }, [abierto]);
 
   useEffect(() => {
     return () => {
@@ -51,6 +85,10 @@ export default function ChatAgente({ sedeId, onAgregar }: Props) {
   }
 
   async function enviar() {
+    if (!consentimiento) {
+      setMostrarConsentimiento(true);
+      return;
+    }
     const texto = input.trim();
     if (!texto || cargando) return;
     setInput("");
@@ -73,6 +111,32 @@ export default function ChatAgente({ sedeId, onAgregar }: Props) {
     <div className="fixed bottom-4 right-4 z-50">
       {abierto && (
         <div className="mb-3 flex h-[32rem] w-80 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10 sm:w-96">
+          {mostrarConsentimiento && !consentimiento && (
+            <div className="flex flex-col gap-3 border-b border-black/10 bg-[#fff8e7] px-4 py-3">
+              <p className="text-sm font-black text-black leading-relaxed">
+                {TEXTO_HABEAS_DATA}
+              </p>
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  onChange={(e) => {
+                    const valor = e.target.checked;
+                    setConsentimiento(valor);
+                    guardarConsentimiento(valor);
+                    if (valor) setMostrarConsentimiento(false);
+                  }}
+                  className="mt-1 h-4 w-4 accent-[#e30ba6] border-2 border-black"
+                />
+                <span className="text-sm font-semibold text-black">
+                  Acepto el tratamiento de mis datos personales
+                </span>
+              </label>
+              <p className="text-xs text-black/60">
+                Puedes revocar este consentimiento en cualquier momento desde la configuración.
+              </p>
+            </div>
+          )}
+
           <div className="flex items-center justify-between bg-brand-red px-4 py-3 text-white">
             <span className="font-bold">🤖 Asistente RAG</span>
             <button onClick={() => setAbierto(false)} aria-label="Cerrar" className="text-xl leading-none">×</button>
@@ -124,22 +188,24 @@ export default function ChatAgente({ sedeId, onAgregar }: Props) {
             {cargando && <div className="text-xs text-gray-500">Pensando…</div>}
           </div>
 
-          <div className="flex gap-2 border-t border-gray-200 bg-white p-2">
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && enviar()}
-              placeholder="¿Qué buscas hoy?"
-              className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm text-brand-dark outline-none focus:border-brand-red"
-            />
-            <button
-              onClick={enviar}
-              disabled={cargando}
-              className="rounded-lg bg-brand-green px-3 text-sm font-bold text-white hover:bg-brand-green-dark disabled:opacity-50"
-            >
-              Enviar
-            </button>
-          </div>
+          {!mostrarConsentimiento && (
+            <div className="flex gap-2 border-t border-gray-200 bg-white p-2">
+              <input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && enviar()}
+                placeholder="¿Qué buscas hoy?"
+                className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm text-brand-dark outline-none focus:border-brand-red"
+              />
+              <button
+                onClick={enviar}
+                disabled={cargando}
+                className="rounded-lg bg-brand-green px-3 text-sm font-bold text-white hover:bg-brand-green-dark disabled:opacity-50"
+              >
+                Enviar
+              </button>
+            </div>
+          )}
         </div>
       )}
 
