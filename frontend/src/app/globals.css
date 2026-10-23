@@ -1,4 +1,4 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 
 @theme {
   --color-brand-red: #C8102E;
@@ -36,9 +36,14 @@ body {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+@keyframes soft-pulse {
+  0%, 100% { opacity: 0.9; transform: scale(0.99); }
+  50% { opacity: 1; transform: scale(1.015); }
+}
+.animate-soft-pulse { animation: soft-pulse 2.4s ease-in-out infinite; }
 .anim-aparecer { animation: aparecer-arriba 400ms cubic-bezier(0.22, 1, 0.36, 1) both; }
 .anim-drawer { animation: entrar-derecha 300ms cubic-bezier(0.22, 1, 0.36, 1) both; }
 .anim-fade { animation: fundir 200ms ease-out both; }
 @media (prefers-reduced-motion: reduce) {
-  .anim-aparecer, .anim-drawer, .anim-fade { animation: none; }
+  .anim-aparecer, .anim-drawer, .anim-fade, .animate-soft-pulse { animation: none; }
 }

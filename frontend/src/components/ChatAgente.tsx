@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { chatear, type Producto } from "@/lib/api";
@@ -42,6 +42,7 @@ export default function ChatAgente({ sedeId, onAgregar }: Props) {
       precio: p.precio,
       sedeId,
       imagen: p.imagen ?? undefined,
+      categoria: p.categoria,
     });
     mostrarAviso(`${p.nombre} agregado al carrito.`);
     setAgregadoKey(clave);
@@ -59,10 +60,13 @@ export default function ChatAgente({ sedeId, onAgregar }: Props) {
     try {
       const { respuesta, productos } = await chatear(texto, sedeId);
       setMensajes((m) => [...m, { rol: "asistente", texto: respuesta, productos }]);
-    } catch {
+    } catch (error) {
+      const textoError = error instanceof TypeError
+        ? "No hay conexión con el servicio de compras. Comprueba que la API esté activa e inténtalo de nuevo."
+        : "El servicio de recomendaciones no pudo responder ahora. Inténtalo de nuevo en un momento.";
       setMensajes((m) => [
         ...m,
-        { rol: "asistente", texto: "No me pude conectar con el servidor. Intenta de nuevo." },
+        { rol: "asistente", texto: textoError },
       ]);
     } finally {
       setCargando(false);
@@ -72,14 +76,14 @@ export default function ChatAgente({ sedeId, onAgregar }: Props) {
   return (
     <div className="fixed bottom-4 right-4 z-50">
       {abierto && (
-        <div className="mb-3 flex h-[32rem] w-80 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10 sm:w-96">
+        <div className="mb-3 flex h-[calc(100dvh-6rem)] max-h-[32rem] w-[calc(100vw-2rem)] max-w-[24rem] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10">
           <div className="flex items-center justify-between bg-brand-red px-4 py-3 text-white">
-            <span className="font-bold">🤖 Asistente RAG</span>
+            <span className="font-semibold tracking-wide">Asistente de compras</span>
             <button onClick={() => setAbierto(false)} aria-label="Cerrar" className="text-xl leading-none">×</button>
           </div>
 
-          <div className="bg-brand-yellow px-3 py-1 text-[11px] font-medium text-brand-dark">
-            Recomendaciones procesadas en tiempo real por un modelo local (Ollama qwen2.5:7b + pgvector).
+          <div className="bg-[#FAF8F6] px-3 py-2 text-[11px] font-medium text-slate-600">
+            Cuéntanos qué necesitas y te ayudamos a encontrarlo en el catálogo.
           </div>
 
           <div className="flex-1 space-y-3 overflow-y-auto bg-brand-bg p-3">

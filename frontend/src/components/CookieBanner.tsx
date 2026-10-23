@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -32,7 +32,7 @@ function guardar(analiticas: boolean) {
   }
 }
 
-const enlace = "font-bold underline underline-offset-2 transition-colors duration-200 hover:text-[#5b00ed]";
+const enlace = "font-bold underline underline-offset-2 transition-colors duration-200 hover:text-[#8B1E2D]";
 
 export default function CookieBanner() {
   const [visible, setVisible] = useState(false);
@@ -75,12 +75,12 @@ export default function CookieBanner() {
     <div
       role="dialog"
       aria-label="Preferencias de cookies"
-      className={`fixed inset-x-4 bottom-4 z-[80] mx-auto max-w-3xl rounded-[25px] border-2 border-[#3f0791] bg-white/95 p-6 text-sm text-[#3f0791] shadow-[6px_6px_0_0_#3f0791] backdrop-blur-md transition-all duration-300 ease-out ${
+      className={`fixed inset-x-4 bottom-4 z-[80] mx-auto max-w-3xl rounded-[25px] border-2 border-[#6B1020] bg-white/95 p-6 text-sm text-[#6B1020] shadow-[6px_6px_0_0_#6B1020] backdrop-blur-md transition-all duration-300 ease-out ${
         animado ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
       }`}
     >
       <p className="text-xl font-black leading-none tracking-tight">🍪 Tu privacidad importa</p>
-      <p className="mt-3 leading-relaxed text-[#3f0791]/90">
+      <p className="mt-3 leading-relaxed text-[#6B1020]/90">
         Usamos cookies y almacenamiento local funcionales para recordar tu carrito y mantener tu sesión. Tus datos
         personales se tratan conforme a la Ley 1581 de 2012 (Habeas Data). Consulta la{" "}
         <Link href="/privacidad" className={enlace}>política de privacidad</Link>, los{" "}
@@ -89,12 +89,12 @@ export default function CookieBanner() {
       </p>
 
       {configurando && (
-        <div className="mt-4 space-y-3 rounded-[18px] bg-[#dad9ff]/60 p-4">
+        <div className="mt-4 space-y-3 rounded-[18px] bg-[#F3E6D9]/60 p-4">
           <label className="flex items-start gap-3 opacity-80">
-            <input type="checkbox" checked disabled className="mt-1 h-4 w-4 accent-[#3f0791]" />
+            <input type="checkbox" checked disabled className="mt-1 h-4 w-4 accent-[#6B1020]" />
             <span>
               <strong>Necesarias</strong>
-              <span className="block text-xs text-[#3f0791]/80">
+              <span className="block text-xs text-[#6B1020]/80">
                 Carrito, sede y registro de tu decisión. Siempre activas.
               </span>
             </span>
@@ -104,11 +104,11 @@ export default function CookieBanner() {
               type="checkbox"
               checked={analiticas}
               onChange={(e) => setAnaliticas(e.target.checked)}
-              className="mt-1 h-4 w-4 accent-[#3f0791]"
+              className="mt-1 h-4 w-4 accent-[#6B1020]"
             />
             <span>
               <strong>Analíticas y mejora del servicio</strong>
-              <span className="block text-xs text-[#3f0791]/80">
+              <span className="block text-xs text-[#6B1020]/80">
                 Opcionales. Nos ayudan a entender qué se busca para mejorar el catálogo.
               </span>
             </span>
@@ -120,7 +120,7 @@ export default function CookieBanner() {
         <button
           type="button"
           onClick={() => decidir(true)}
-          className="rounded-[52px] border-2 border-[#3f0791] bg-[#3f0791] px-6 py-2.5 font-black text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#5b00ed] active:scale-95"
+          className="rounded-[52px] border-2 border-[#6B1020] bg-[#6B1020] px-6 py-2.5 font-black text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#8B1E2D] active:scale-95"
         >
           Aceptar todas
         </button>
@@ -129,14 +129,14 @@ export default function CookieBanner() {
             <button
               type="button"
               onClick={() => decidir(analiticas)}
-              className="rounded-[52px] border-2 border-[#3f0791] px-6 py-2.5 font-black text-[#3f0791] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#dad9ff] active:scale-95"
+              className="rounded-[52px] border-2 border-[#6B1020] px-6 py-2.5 font-black text-[#6B1020] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#F3E6D9] active:scale-95"
             >
               Guardar selección
             </button>
             <button
               type="button"
               onClick={() => decidir(false)}
-              className="rounded-[52px] px-4 py-2.5 font-bold text-[#3f0791]/80 transition-all duration-200 hover:text-[#3f0791] active:scale-95"
+              className="rounded-[52px] px-4 py-2.5 font-bold text-[#6B1020]/80 transition-all duration-200 hover:text-[#6B1020] active:scale-95"
             >
               Solo necesarias
             </button>
@@ -145,7 +145,7 @@ export default function CookieBanner() {
           <button
             type="button"
             onClick={() => setConfigurando(true)}
-            className="rounded-[52px] border-2 border-[#3f0791] px-6 py-2.5 font-black text-[#3f0791] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#dad9ff] active:scale-95"
+            className="rounded-[52px] border-2 border-[#6B1020] px-6 py-2.5 font-black text-[#6B1020] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#F3E6D9] active:scale-95"
           >
             Configurar
           </button>

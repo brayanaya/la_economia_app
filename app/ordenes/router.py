@@ -2,13 +2,15 @@
 import uuid
 from decimal import ROUND_HALF_UP, Decimal
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Response, Request, status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.core.database import get_db as get_db
+from app.auth.router import current_session, check_csrf
+from app.auth.models import CustomerSession
 from .crud import obtener_orden
 from .models import DetalleOrden, Orden
 from .schemas import OrdenConsultaOut, OrdenCreate, OrdenOut
@@ -18,7 +20,8 @@ CENTAVOS = Decimal("0.01")
 
 
 @router.post("/", response_model=OrdenOut, status_code=status.HTTP_201_CREATED)
-async def crear_orden(payload: OrdenCreate, db: AsyncSession = Depends(get_db)):
+async def crear_orden(payload: OrdenCreate, request: Request, session: CustomerSession = Depends(current_session), db: AsyncSession = Depends(get_db)):
+    check_csrf(request, session)
     orden_id = uuid.uuid4()
     total = Decimal("0")
     detalles = []
@@ -41,6 +44,7 @@ async def crear_orden(payload: OrdenCreate, db: AsyncSession = Depends(get_db)):
     orden = Orden(
         id=orden_id,
         sede_id=payload.sede_id,
+        customer_id=session.user_id,
         cliente_nombre=payload.cliente_nombre,
         cliente_telefono=payload.cliente_telefono,
         notas=payload.notas,

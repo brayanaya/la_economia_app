@@ -1,4 +1,5 @@
-﻿// carrito-v1
+// carrito-v1
+import { getCsrfToken } from "@/lib/auth";
 const RAW = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 export const ORDENES_API = RAW.replace(/\/+$/, "").replace(/\/api\/v1$/, "") + "/api/v1";
 
@@ -59,7 +60,8 @@ function mensajeError(detail: unknown): string {
 export async function crearOrden(payload: OrdenPayload): Promise<OrdenCreada> {
   const res = await fetch(`${ORDENES_API}/ordenes/`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    headers: { "Content-Type": "application/json", ...(getCsrfToken() ? { "X-CSRF-Token": getCsrfToken()! } : {}) },
     body: JSON.stringify(payload),
   });
   if (!res.ok) {

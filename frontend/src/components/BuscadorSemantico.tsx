@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, type FormEvent } from "react";
 
@@ -49,20 +49,20 @@ export default function BuscadorSemantico({ cargando, onBuscar }: Props) {
     <div>
       <form onSubmit={enviar} role="search" className="flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
-          <IconoLupa className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-[#3f0791]/60" />
+          <IconoLupa className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-[#6B1020]/55" />
           <input
             value={valor}
             onChange={(e) => setValor(e.target.value)}
             placeholder="Busca lo que necesitas: café molido, algo para el desayuno…"
             aria-label="Buscar productos"
-            className="h-14 w-full rounded-[52px] border-2 border-[#3f0791] bg-white pl-12 pr-12 text-base font-medium text-[#3f0791] shadow-lg outline-none transition-all duration-200 placeholder:text-[#3f0791]/70 focus:ring-4 focus:ring-white/60"
+            className="h-14 w-full rounded-full border border-white/30 bg-white pl-12 pr-12 text-base font-medium text-[#4A0B16] shadow-[0_12px_32px_rgba(0,0,0,0.16)] outline-none transition-all duration-300 ease-in-out placeholder:text-slate-500 focus:ring-4 focus:ring-amber-300/35"
           />
           {valor && (
             <button
               type="button"
               onClick={limpiar}
               aria-label="Limpiar búsqueda"
-              className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full px-2 py-1 text-sm font-bold text-[#3f0791]/60 transition-all duration-200 hover:bg-[#dad9ff] hover:text-[#3f0791] active:scale-95"
+              className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full px-2 py-1 text-sm font-bold text-[#6B1020]/60 transition-all duration-200 hover:bg-[#F3E6D9] hover:text-[#6B1020] active:scale-95"
             >
               ✕
             </button>
@@ -71,7 +71,7 @@ export default function BuscadorSemantico({ cargando, onBuscar }: Props) {
         <button
           type="submit"
           disabled={cargando}
-          className="flex h-14 items-center justify-center gap-2 rounded-[52px] border-2 border-[#3f0791] bg-[#3f0791] px-8 font-black text-white shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#2f0570] active:scale-95 disabled:cursor-wait disabled:opacity-70 disabled:active:scale-100"
+          className="flex h-14 items-center justify-center gap-2 rounded-full bg-[#090909] px-8 font-semibold text-white shadow-[0_10px_30px_rgba(0,0,0,0.24)] transition-all duration-300 ease-in-out hover:-translate-y-1 hover:bg-[#191919] hover:shadow-[0_12px_34px_rgba(0,0,0,0.3)] active:scale-95 disabled:cursor-wait disabled:opacity-70 disabled:active:scale-100"
         >
           {cargando ? <IconoCarga className="h-5 w-5" /> : <IconoLupa className="h-5 w-5" />}
           <span>Buscar</span>
@@ -85,7 +85,7 @@ export default function BuscadorSemantico({ cargando, onBuscar }: Props) {
             key={s}
             type="button"
             onClick={() => usarSugerencia(s)}
-            className="rounded-[52px] border-2 border-white/70 bg-[#3f0791]/60 px-4 py-1 font-bold text-white backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:text-[#3f0791] active:scale-95"
+            className="rounded-[52px] border-2 border-white/70 bg-[#6B1020]/60 px-4 py-1 font-bold text-white backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:text-[#6B1020] active:scale-95"
           >
             {s}
           </button>

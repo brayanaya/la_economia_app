@@ -19,6 +19,7 @@ export interface ItemCarrito {
   sedeId: string;
   sedeNombre?: string;
   imagen?: string;
+  categoria?: string;
 }
 
 interface CarritoContextValue {
@@ -30,6 +31,7 @@ interface CarritoContextValue {
   abrir: () => void;
   cerrar: () => void;
   agregar: (item: Omit<ItemCarrito, "cantidad">, cantidad?: number) => void;
+  reasignarTodos: (sedeId: string, sedeNombre: string) => void;
   cambiarCantidad: (productoId: string, sedeId: string, cantidad: number) => void;
   quitar: (productoId: string, sedeId: string) => void;
   vaciarSede: (sedeId: string) => void;
@@ -96,6 +98,21 @@ export function CarritoProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const reasignarTodos = useCallback((sedeId: string, sedeNombre: string) => {
+    setItems((prev) => prev.reduce<ItemCarrito[]>((acumulado, item) => {
+      const existente = acumulado.findIndex((actual) => actual.productoId === item.productoId);
+      if (existente >= 0) {
+        acumulado[existente] = {
+          ...acumulado[existente],
+          cantidad: Math.min(MAX_CANTIDAD, acumulado[existente].cantidad + item.cantidad),
+        };
+      } else {
+        acumulado.push({ ...item, sedeId, sedeNombre });
+      }
+      return acumulado;
+    }, []));
+  }, []);
+
   const cambiarCantidad = useCallback((productoId: string, sedeId: string, cantidad: number) => {
     setItems((prev) =>
       cantidad < 1
@@ -126,9 +143,9 @@ export function CarritoProvider({ children }: { children: ReactNode }) {
   const value = useMemo<CarritoContextValue>(
     () => ({
       items, hidratado, abierto, totalItems, totalPrecio,
-      abrir, cerrar, agregar, cambiarCantidad, quitar, vaciarSede, vaciar,
+      abrir, cerrar, agregar, reasignarTodos, cambiarCantidad, quitar, vaciarSede, vaciar,
     }),
-    [items, hidratado, abierto, totalItems, totalPrecio, abrir, cerrar, agregar, cambiarCantidad, quitar, vaciarSede, vaciar],
+    [items, hidratado, abierto, totalItems, totalPrecio, abrir, cerrar, agregar, reasignarTodos, cambiarCantidad, quitar, vaciarSede, vaciar],
   );
 
   return <CarritoContext.Provider value={value}>{children}</CarritoContext.Provider>;

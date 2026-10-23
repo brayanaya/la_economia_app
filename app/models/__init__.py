@@ -20,3 +20,5 @@ __all__ = [
     "Sede",
     "TransaccionSiigo",
 ]
+
+from app.auth.models import Customer, CustomerSession  # noqa: F401

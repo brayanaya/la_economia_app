@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -8,8 +8,8 @@ const ANIO = 2026;
 
 function Sello({ d, titulo, detalle }: { d: string; titulo: string; detalle: string }) {
   return (
-    <div className="flex items-center gap-3 rounded-[25px] border-2 border-white/20 bg-white/5 p-4 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-[#dad9ff] hover:bg-white/10">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className="h-8 w-8 shrink-0 text-[#dad9ff]" aria-hidden="true">
+    <div className="flex items-center gap-3 rounded-[25px] border-2 border-white/20 bg-white/5 p-4 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-[#F3E6D9] hover:bg-white/10">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className="h-8 w-8 shrink-0 text-[#F3E6D9]" aria-hidden="true">
         <path strokeLinecap="round" strokeLinejoin="round" d={d} />
       </svg>
       <div>
@@ -26,7 +26,7 @@ const ICONO_CHECK = "M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18
 const ICONO_CANDADO =
   "M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z";
 
-const enlace = "text-white/80 underline-offset-4 transition-colors duration-200 hover:text-[#dad9ff] hover:underline";
+const enlace = "text-white/80 underline-offset-4 transition-colors duration-200 hover:text-[#F3E6D9] hover:underline";
 
 export default function FooterCompliance() {
   const [https, setHttps] = useState(false);
@@ -40,7 +40,7 @@ export default function FooterCompliance() {
   }
 
   return (
-    <footer className="border-t-4 border-[#5b00ed] bg-black text-white">
+    <footer className="border-t-4 border-[#8B1E2D] bg-black text-white">
       <div className="mx-auto max-w-7xl space-y-8 px-4 py-12 text-sm">
         <div>
           <p className="text-2xl font-black leading-none tracking-tight text-white">La Economía Aya</p>

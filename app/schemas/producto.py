@@ -53,3 +53,12 @@ class ProductoListResponse(BaseModel):
     limite: int
     total_registros: int
     total_paginas: int
+
+
+class ProductoBusqueda(BaseModel):
+    id: uuid.UUID
+    nombre: str
+    precio: Decimal
+    stock: int
+    categoria: str | None = None
+    imagen: str | None = None

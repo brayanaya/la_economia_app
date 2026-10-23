@@ -25,6 +25,15 @@ services:
     networks:
       - la_economia_net
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: la_economia_ollama
+    restart: unless-stopped
+    volumes:
+      - la_economia_ollama_data:/root/.ollama
+    networks:
+      - la_economia_net
+
   api:
     build:
       context: .
@@ -35,11 +44,15 @@ services:
       - .env
     environment:
       POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
     ports:
       - "8000:8000"
     depends_on:
       postgres:
         condition: service_healthy
+      ollama:
+        condition: service_started
     networks:
       - la_economia_net
     volumes:
@@ -48,6 +61,8 @@ services:
 volumes:
   la_economia_pgdata:
     name: la_economia_pgdata
+  la_economia_ollama_data:
+    name: la_economia_ollama_data
 
 networks:
   la_economia_net:

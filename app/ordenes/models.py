@@ -13,6 +13,7 @@ class Orden(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     sede_id = Column(UUID(as_uuid=True), nullable=False, index=True)
+    customer_id = Column(UUID(as_uuid=True), ForeignKey("customers.id", ondelete="SET NULL"), nullable=True, index=True)
     cliente_nombre = Column(String(120), nullable=False)
     cliente_telefono = Column(String(30), nullable=True)
     notas = Column(String(500), nullable=True)

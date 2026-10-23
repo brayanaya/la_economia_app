@@ -1,4 +1,4 @@
-﻿export const EVENTO_AVISO = "la-economia:aviso";
+export const EVENTO_AVISO = "la-economia:aviso";
 
 export function mostrarAviso(mensaje: string): void {
   if (typeof window === "undefined") return;

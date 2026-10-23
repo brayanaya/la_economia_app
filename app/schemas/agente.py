@@ -1,7 +1,14 @@
-﻿from pydantic import BaseModel, Field
-import uuid
+﻿import uuid
+from typing import Literal
+
+from pydantic import BaseModel, Field
 
 from app.schemas.busqueda import ProductoRecuperado
+
+
+class MensajeHistorial(BaseModel):
+    rol: Literal["usuario", "asistente"]
+    texto: str = Field(..., min_length=1, max_length=1000)
 
 
 class AgenteChatRequest(BaseModel):
@@ -9,6 +16,7 @@ class AgenteChatRequest(BaseModel):
     sede_id: uuid.UUID | None = Field(
         default=None, description="Si se especifica, filtra disponibilidad por stock en esa sede."
     )
+    historial: list[MensajeHistorial] = Field(default_factory=list, max_length=8)
 
 
 class AgenteChatResponse(BaseModel):

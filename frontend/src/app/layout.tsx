@@ -1,7 +1,8 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { CarritoProvider } from "@/context/CarritoContext";
+import { AuthProvider } from "@/context/AuthContext";
 import CarritoDrawer from "@/components/CarritoDrawer";
 import CookieBanner from "@/components/CookieBanner";
 import AvisoGlobal from "@/components/AvisoGlobal";
@@ -24,12 +25,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: import("react").ReactNode }) {
   return (
-    <html lang="es" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="es" className={`${geistSans.variable} ${geistMono.variable} h-full scroll-smooth antialiased`}>
       <body className="min-h-full flex flex-col">
-        <CarritoProvider>
-          {children}
-          <CarritoDrawer />
-        </CarritoProvider>
+        <AuthProvider>
+          <CarritoProvider>
+            {children}
+            <CarritoDrawer />
+          </CarritoProvider>
+        </AuthProvider>
         <CookieBanner />
         <AvisoGlobal />
       </body>

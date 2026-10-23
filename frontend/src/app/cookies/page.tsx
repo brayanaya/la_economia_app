@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import LegalShell, { Pendiente } from "@/components/LegalShell";
 
 export const metadata: Metadata = {

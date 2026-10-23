@@ -1,4 +1,4 @@
-﻿// Acepta NEXT_PUBLIC_API_URL con o sin el sufijo /api/v1 y barras finales: BASE agrega /api/v1 una sola vez.
+// Acepta NEXT_PUBLIC_API_URL con o sin el sufijo /api/v1 y barras finales: BASE agrega /api/v1 una sola vez.
 export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000")
   .replace(/\/+$/, "")
   .replace(/\/api\/v1$/, "");
@@ -10,7 +10,7 @@ export type Sede = { nombre: string; id: string | null };
 export const SEDES: Sede[] = [
   { nombre: "Todas", id: null },
   { nombre: "Santa Isabel", id: "a0000000-0000-0000-0000-000000000001" },
-  { nombre: "Machines", id: "a0000000-0000-0000-0000-000000000002" },
+  { nombre: "Palmas", id: "a0000000-0000-0000-0000-000000000002" }, // nombre comercial de la sede Machines del backend
 ];
 
 export type Producto = {
@@ -19,6 +19,7 @@ export type Producto = {
   precio: number;
   stock: number;
   sede?: string;
+  categoria?: string;
   imagen?: string;
   similitud?: number; // 0 a 1
 };
@@ -38,13 +39,15 @@ export function normalizarProducto(raw: Raw, i = 0): Producto {
     if (!Number.isNaN(s)) similitud = s > 1 ? s / 100 : s;
   }
   const sede = raw.sede ?? raw.sede_nombre;
+  const categoria = raw.categoria ?? raw.categoria_nombre;
   const imagen = raw.imagen ?? raw.imagen_url ?? raw.image;
   return {
     id: (raw.id ?? raw.producto_id ?? i) as string | number,
     nombre: String(raw.nombre ?? raw.name ?? raw.descripcion ?? "Producto"),
     precio: num(raw.precio ?? raw.precio_venta ?? raw.price),
     stock: Number(raw.stock_sede ?? raw.stock ?? 0) || 0,
-    sede: sede ? String(sede) : undefined,
+    sede: sede ? (String(sede) === "Machines" ? "Palmas" : String(sede)) : undefined,
+    categoria: categoria ? String(categoria) : undefined,
     imagen: imagen ? String(imagen) : undefined,
     similitud,
   };
@@ -76,11 +79,22 @@ export async function buscarSemantica(consulta: string, sedeId: string | null, t
   return extraerLista(data).map(normalizarProducto);
 }
 
+export async function buscarProductos(consulta: string, sedeId: string | null): Promise<Producto[]> {
+  const params = new URLSearchParams({ q: consulta });
+  if (sedeId) params.set("sede_id", sedeId);
+  const res = await fetch(`${BASE}/productos/buscar?${params.toString()}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return extraerLista(await res.json()).map(normalizarProducto);
+}
+
+export type MensajeHistorial = { rol: "usuario" | "asistente"; texto: string };
+
 export async function chatear(
   mensaje: string,
-  sedeId: string | null
+  sedeId: string | null,
+  historial: MensajeHistorial[] = []
 ): Promise<{ respuesta: string; productos: Producto[] }> {
-  const data = (await post("/agente/chat", { mensaje, sede_id: sedeId })) as Raw;
+  const data = (await post("/agente/chat", { mensaje, sede_id: sedeId, historial: historial.slice(-8) })) as Raw;
   const respuesta = String(data.respuesta ?? data.response ?? data.message ?? "No pude generar una respuesta.");
   const productos = extraerLista({ productos: data.productos_recomendados }).map(normalizarProducto);
   return { respuesta, productos };

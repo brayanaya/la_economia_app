@@ -8,6 +8,9 @@ class Settings(BaseSettings):
     app_version: str = "0.1.0"
     api_v1_prefix: str = "/api/v1"
     debug: bool = False
+    auth_cookie_name: str = "la_economia_session"
+    auth_cookie_secure: bool = True
+    auth_session_ttl_seconds: int = 1209600
     cors_origins: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000", "http://192.168.56.1:3000", "http://localhost:8081"]
 
     postgres_user: str
