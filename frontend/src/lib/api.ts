@@ -93,11 +93,13 @@ export async function chatear(
   mensaje: string,
   sedeId: string | null,
   historial: MensajeHistorial[] = []
-): Promise<{ respuesta: string; productos: Producto[] }> {
+): Promise<{ respuesta: string; productos: Producto[]; generadoPorLlm: boolean }> {
   const data = (await post("/agente/chat", { mensaje, sede_id: sedeId, historial: historial.slice(-8) })) as Raw;
   const respuesta = String(data.respuesta ?? data.response ?? data.message ?? "No pude generar una respuesta.");
   const productos = extraerLista({ productos: data.productos_recomendados }).map(normalizarProducto);
-  return { respuesta, productos };
+  // generado_por_llm ausente cuenta como LLM para no marcar siempre "modo basico".
+  const generadoPorLlm = data.generado_por_llm !== false;
+  return { respuesta, productos, generadoPorLlm };
 }
 
 export async function registrarConsentimiento(

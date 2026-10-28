@@ -24,3 +24,7 @@ class AgenteChatResponse(BaseModel):
     respuesta: str
     productos_recomendados: list[ProductoRecuperado]
     hubo_resultados_relevantes: bool
+    generado_por_llm: bool = Field(
+        default=False,
+        description="True si la respuesta la redacto un LLM; False si uso el respondedor determinista de respaldo.",
+    )
