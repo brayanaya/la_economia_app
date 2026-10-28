@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Gaseosa">
+  <rect width="400" height="300" rx="24" fill="#FFF8F0"/>
+  <circle cx="330" cy="240" r="90" fill="#C8102E" opacity=".08"/>
+  <ellipse cx="200" cy="242" rx="110" ry="18" fill="#3D1017" opacity=".08"/>
+  <path d="M188 58h24v22h-24z" fill="#6B1020"/>
+  <rect x="182" y="46" width="36" height="16" rx="8" fill="#C8102E"/>
+  <path d="M188 80h24l16 36v106a16 16 0 0 1-16 16h-40a16 16 0 0 1-16-16V116z" fill="#C8102E" stroke="#6B1020" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M188 80h24l16 36H172z" fill="#E04B39"/>
+  <rect x="164" y="136" width="72" height="54" rx="8" fill="#FFF8F0"/>
+  <text x="200" y="160" font-family="Arial, sans-serif" font-size="14" font-weight="900" text-anchor="middle" fill="#6B1020">GASEOSA</text>
+  <text x="200" y="180" font-family="Arial, sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#C8102E">1.5 L</text>
+  <g fill="#FFF8F0" opacity=".9">
+    <circle cx="176" cy="110" r="4"/><circle cx="188" cy="98" r="3"/><circle cx="206" cy="104" r="4"/><circle cx="218" cy="92" r="3"/>
+  </g>
+  <path d="M120 130c-8 10-8 22 0 32" stroke="#FFC72C" stroke-width="6" fill="none" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Fríjol cargamanto">
+  <rect width="400" height="300" rx="24" fill="#FFF8F0"/>
+  <circle cx="70" cy="240" r="90" fill="#C8102E" opacity=".08"/>
+  <ellipse cx="200" cy="238" rx="120" ry="18" fill="#3D1017" opacity=".08"/>
+  <path d="M120 70h160a12 12 0 0 1 12 12l8 128a16 16 0 0 1-16 17H116a16 16 0 0 1-16-17l8-128a12 12 0 0 1 12-12Z" fill="#F3E6D9" stroke="#6B1020" stroke-width="6"/>
+  <path d="M110 118h180l-6 96a14 14 0 0 1-14 12H130a14 14 0 0 1-14-12Z" fill="#7B2D26"/>
+  <rect x="142" y="86" width="116" height="26" rx="13" fill="#FFC72C"/>
+  <text x="200" y="105" font-family="Arial, sans-serif" font-size="14" font-weight="900" text-anchor="middle" fill="#3D1017">FRÍJOL</text>
+  <g fill="#C0533F">
+    <ellipse cx="168" cy="150" rx="16" ry="10" transform="rotate(-18 168 150)"/>
+    <ellipse cx="210" cy="166" rx="16" ry="10" transform="rotate(14 210 166)"/>
+    <ellipse cx="176" cy="196" rx="16" ry="10" transform="rotate(-40 176 196)"/>
+    <ellipse cx="232" cy="202" rx="16" ry="10" transform="rotate(30 232 202)"/>
+  </g>
+</svg>

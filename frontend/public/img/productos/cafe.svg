@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Café tostado molido">
+  <rect width="400" height="300" rx="24" fill="#FFF8F0"/>
+  <circle cx="330" cy="240" r="90" fill="#FFC72C" opacity=".12"/>
+  <ellipse cx="200" cy="238" rx="120" ry="18" fill="#3D1017" opacity=".08"/>
+  <path d="M124 84h152a12 12 0 0 1 12 12l8 114a16 16 0 0 1-16 17H120a16 16 0 0 1-16-17l8-114a12 12 0 0 1 12-12Z" fill="#4A2C1A" stroke="#6B1020" stroke-width="6"/>
+  <path d="M96 116h208l3 44H93Z" fill="#C8102E"/>
+  <text x="200" y="144" font-family="Arial, sans-serif" font-size="16" font-weight="900" text-anchor="middle" fill="#FFF8F0">CAFÉ MOLIDO</text>
+  <g fill="#F6CE84" stroke="#3D1017" stroke-width="2">
+    <ellipse cx="160" cy="200" rx="13" ry="9" transform="rotate(-20 160 200)"/>
+    <ellipse cx="200" cy="212" rx="13" ry="9" transform="rotate(15 200 212)"/>
+    <ellipse cx="242" cy="198" rx="13" ry="9" transform="rotate(-8 242 198)"/>
+  </g>
+  <path d="M160 196c3 3 3 6 0 8M200 208c3 3 3 6 0 8M242 194c3 3 3 6 0 8" stroke="#3D1017" stroke-width="2" fill="none"/>
+  <path d="M276 70c8 8 8 20 0 28" stroke="#FFC72C" stroke-width="8" fill="none" stroke-linecap="round"/>
+</svg>

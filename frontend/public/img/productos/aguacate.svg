@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Aguacate hass">
+  <rect width="400" height="300" rx="24" fill="#FFF8F0"/>
+  <circle cx="330" cy="240" r="90" fill="#16A34A" opacity=".10"/>
+  <ellipse cx="200" cy="240" rx="120" ry="18" fill="#3D1017" opacity=".08"/>
+  <path d="M200 76c-52 0-88 42-88 88s36 76 88 76 88-30 88-76-36-88-88-88Z" fill="#3E7C33" stroke="#6B1020" stroke-width="6"/>
+  <path d="M200 96c-40 0-68 34-68 68s28 56 68 56 68-22 68-56-28-68-68-68Z" fill="#6FAE4E"/>
+  <path d="M200 116c-28 0-48 24-48 48s20 36 48 36 48-12 48-36-20-48-48-48Z" fill="#E8C466"/>
+  <ellipse cx="200" cy="164" rx="26" ry="28" fill="#7A4B22"/>
+  <path d="M176 148c8-8 18-10 28-6" stroke="#F0DDBA" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <rect x="132" y="60" width="136" height="28" rx="14" fill="#16A34A"/>
+  <text x="200" y="80" font-family="Arial, sans-serif" font-size="14" font-weight="900" text-anchor="middle" fill="#FFF8F0">AGUACATE 500g</text>
+</svg>

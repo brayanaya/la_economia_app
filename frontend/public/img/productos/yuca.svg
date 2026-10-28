@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Yuca fresca">
+  <rect width="400" height="300" rx="24" fill="#FFF8F0"/>
+  <circle cx="70" cy="60" r="90" fill="#8B5E34" opacity=".10"/>
+  <ellipse cx="200" cy="240" rx="120" ry="18" fill="#3D1017" opacity=".08"/>
+  <g stroke="#6B1020" stroke-width="6" stroke-linejoin="round">
+    <path d="M96 150c30 8 60 30 78 62l-18 14c-24-28-44-46-72-58Z" fill="#E8D3AE"/>
+    <path d="M304 142c-30 6-62 28-82 60l18 15c26-26 48-44 76-54Z" fill="#F0DDBA"/>
+  </g>
+  <path d="M96 150l-12 4 10 18" fill="#C9A96B" stroke="#6B1020" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M304 142l12 3-9 19" fill="#C9A96B" stroke="#6B1020" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M120 176c20 8 36 22 50 38M280 168c-18 8-34 20-48 36" stroke="#C9A96B" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <rect x="132" y="62" width="136" height="28" rx="14" fill="#16A34A"/>
+  <text x="200" y="82" font-family="Arial, sans-serif" font-size="14" font-weight="900" text-anchor="middle" fill="#FFF8F0">YUCA x KG</text>
+</svg>

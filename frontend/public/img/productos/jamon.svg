@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Jamón de cerro">
+  <rect width="400" height="300" rx="24" fill="#FFF8F0"/>
+  <circle cx="70" cy="60" r="90" fill="#C8102E" opacity=".08"/>
+  <ellipse cx="200" cy="240" rx="120" ry="18" fill="#3D1017" opacity=".08"/>
+  <path d="M110 200c0-52 40-92 90-92s90 26 90 60c0 22-18 32-40 32Z" fill="#EE8074" stroke="#6B1020" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M120 202c4-60 52-92 106-86 40 4 58 26 58 46" fill="#F6A79C" stroke="#E06A5C" stroke-width="4"/>
+  <path d="M110 200h180c6 0 10 4 10 10s-4 10-10 10H110c-6 0-10-4-10-10s4-10 10-10Z" fill="#C8102E" stroke="#6B1020" stroke-width="5"/>
+  <g fill="#FFF6E5">
+    <circle cx="150" cy="170" r="8"/><circle cx="190" cy="150" r="8"/><circle cx="230" cy="176" r="8"/><circle cx="260" cy="146" r="8"/>
+  </g>
+  <rect x="132" y="58" width="136" height="28" rx="14" fill="#C8102E"/>
+  <text x="200" y="78" font-family="Arial, sans-serif" font-size="14" font-weight="900" text-anchor="middle" fill="#FFF8F0">JAMÓN 250g</text>
+</svg>

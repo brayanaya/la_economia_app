@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Arepa blanca">
+  <rect width="400" height="300" rx="24" fill="#FFF8F0"/>
+  <circle cx="70" cy="60" r="90" fill="#C8102E" opacity=".08"/>
+  <ellipse cx="200" cy="240" rx="120" ry="18" fill="#3D1017" opacity=".08"/>
+  <ellipse cx="200" cy="212" rx="112" ry="30" fill="#EBB65B" stroke="#6B1020" stroke-width="6"/>
+  <ellipse cx="200" cy="186" rx="112" ry="30" fill="#F6CE84" stroke="#6B1020" stroke-width="6"/>
+  <ellipse cx="200" cy="160" rx="112" ry="30" fill="#FBDCA8" stroke="#6B1020" stroke-width="6"/>
+  <ellipse cx="200" cy="152" rx="56" ry="13" fill="#FFF6E5" opacity=".8"/>
+  <circle cx="288" cy="92" r="7" fill="#C0533F"/>
+  <circle cx="306" cy="104" r="7" fill="#C0533F"/>
+  <circle cx="296" cy="118" r="7" fill="#C0533F"/>
+  <rect x="110" y="60" width="120" height="30" rx="15" fill="#C8102E"/>
+  <text x="170" y="81" font-family="Arial, sans-serif" font-size="15" font-weight="900" text-anchor="middle" fill="#FFF8F0">AREPA x6</text>
+</svg>

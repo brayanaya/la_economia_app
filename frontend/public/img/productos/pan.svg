@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Pan tajado">
+  <rect width="400" height="300" rx="24" fill="#FFF8F0"/>
+  <circle cx="330" cy="60" r="90" fill="#FFC72C" opacity=".12"/>
+  <ellipse cx="200" cy="238" rx="120" ry="18" fill="#3D1017" opacity=".08"/>
+  <path d="M110 190h180a14 14 0 0 0 14-14v-52a24 24 0 0 0-24-24H120a24 24 0 0 0-24 24v52a14 14 0 0 0 14 14Z" fill="#E3A65C" stroke="#6B1020" stroke-width="6"/>
+  <path d="M116 100h168l-10 76a10 10 0 0 1-10 9H136a10 10 0 0 1-10-9Z" fill="#F6CE84"/>
+  <path d="M150 100v85M184 100v85M218 100v85" stroke="#E3A65C" stroke-width="6"/>
+  <ellipse cx="150" cy="86" rx="7" ry="4" fill="#E3A65C"/>
+  <ellipse cx="190" cy="80" rx="7" ry="4" fill="#E3A65C"/>
+  <ellipse cx="230" cy="86" rx="7" ry="4" fill="#E3A65C"/>
+  <rect x="140" y="52" width="110" height="26" rx="13" fill="#C8102E"/>
+  <text x="195" y="71" font-family="Arial, sans-serif" font-size="14" font-weight="900" text-anchor="middle" fill="#FFF8F0">PAN 400g</text>
+</svg>

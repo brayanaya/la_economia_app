@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Aceite">
+  <rect width="400" height="300" rx="24" fill="#FFF8F0"/>
+  <circle cx="330" cy="240" r="90" fill="#FFC72C" opacity=".14"/>
+  <ellipse cx="200" cy="240" rx="110" ry="18" fill="#3D1017" opacity=".08"/>
+  <path d="M170 60h60v30h-60z" fill="#C8102E" stroke="#6B1020" stroke-width="5"/>
+  <path d="M148 90h104l16 26v106a14 14 0 0 1-14 14H146a14 14 0 0 1-14-14V116z" fill="#F9C74F" stroke="#6B1020" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="150" y="136" width="98" height="76" rx="10" fill="#FFF8F0" stroke="#6B1020" stroke-width="4"/>
+  <text x="199" y="168" font-family="Arial, sans-serif" font-size="17" font-weight="900" text-anchor="middle" fill="#6B1020">ACEITE</text>
+  <text x="199" y="192" font-family="Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#C8102E">500 ml</text>
+  <circle cx="290" cy="100" r="10" fill="#FFC72C" opacity=".8"/>
+</svg>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Cebolla larga junca">
+  <rect width="400" height="300" rx="24" fill="#FFF8F0"/>
+  <circle cx="330" cy="60" r="90" fill="#16A34A" opacity=".10"/>
+  <ellipse cx="200" cy="240" rx="120" ry="18" fill="#3D1017" opacity=".08"/>
+  <g stroke="#2F8F4E" stroke-width="14" fill="none" stroke-linecap="round">
+    <path d="M150 240V120c0-30-8-44-20-54"/>
+    <path d="M200 240V110c0-34 4-48 12-60"/>
+    <path d="M250 240V126c0-28 10-42 24-52"/>
+  </g>
+  <g stroke="#5FBF7A" stroke-width="5" fill="none" stroke-linecap="round">
+    <path d="M140 140c-2-14-8-24-16-30M210 132c2-14 8-24 16-32M262 150c-4-12-2-24 4-34"/>
+  </g>
+  <g fill="#F0F7EE" stroke="#6B1020" stroke-width="6">
+    <path d="M135 240c-4-16 4-30 15-30s19 14 15 30Z"/>
+    <path d="M185 240c-4-16 4-30 15-30s19 14 15 30Z"/>
+    <path d="M235 240c-4-16 4-30 15-30s19 14 15 30Z"/>
+  </g>
+  <path d="M120 240h160" stroke="#6B1020" stroke-width="6" stroke-linecap="round"/>
+  <rect x="132" y="62" width="136" height="28" rx="14" fill="#C8102E"/>
+  <text x="200" y="82" font-family="Arial, sans-serif" font-size="14" font-weight="900" text-anchor="middle" fill="#FFF8F0">CEBOLLA 500g</text>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Lentejas">
+  <rect width="400" height="300" rx="24" fill="#FFF8F0"/>
+  <circle cx="330" cy="240" r="90" fill="#FFC72C" opacity=".12"/>
+  <ellipse cx="200" cy="238" rx="120" ry="18" fill="#3D1017" opacity=".08"/>
+  <path d="M128 100h144a12 12 0 0 1 12 12l8 96a16 16 0 0 1-16 17H124a16 16 0 0 1-16-17l8-96a12 12 0 0 1 12-12Z" fill="#F3E6D9" stroke="#6B1020" stroke-width="6"/>
+  <path d="M140 130h120v70a8 8 0 0 1-8 8h-104a8 8 0 0 1-8-8Z" fill="#D98E32"/>
+  <text x="200" y="112" font-family="Arial, sans-serif" font-size="15" font-weight="900" text-anchor="middle" fill="#6B1020">LENTEJAS</text>
+  <g fill="#B4721F">
+    <circle cx="162" cy="152" r="7"/><circle cx="192" cy="152" r="7"/><circle cx="222" cy="152" r="7"/>
+    <circle cx="162" cy="176" r="7"/><circle cx="192" cy="176" r="7"/><circle cx="222" cy="176" r="7"/>
+    <circle cx="177" cy="164" r="7"/><circle cx="207" cy="164" r="7"/><circle cx="237" cy="164" r="7"/>
+  </g>
+  <path d="M150 196h100" stroke="#6B1020" stroke-width="4" stroke-linecap="round"/>
+</svg>

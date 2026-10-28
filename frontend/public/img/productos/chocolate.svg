@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Chocolate en polvo">
+  <rect width="400" height="300" rx="24" fill="#FFF8F0"/>
+  <circle cx="70" cy="240" r="90" fill="#C8102E" opacity=".08"/>
+  <ellipse cx="200" cy="238" rx="110" ry="18" fill="#3D1017" opacity=".08"/>
+  <path d="M118 76h164a12 12 0 0 1 12 12l6 122a18 18 0 0 1-18 19H118a18 18 0 0 1-18-19l6-122a12 12 0 0 1 12-12Z" fill="#5C3A21" stroke="#6B1020" stroke-width="6"/>
+  <rect x="136" y="100" width="128" height="70" rx="10" fill="#FFC72C"/>
+  <text x="200" y="132" font-family="Arial, sans-serif" font-size="16" font-weight="900" text-anchor="middle" fill="#3D1017">CHOCOLATE</text>
+  <text x="200" y="156" font-family="Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#6B1020">250 g</text>
+  <g fill="#FFF6E5">
+    <circle cx="160" cy="204" r="8"/><circle cx="188" cy="212" r="8"/><circle cx="216" cy="204" r="8"/><circle cx="244" cy="212" r="8"/>
+  </g>
+  <path d="M282 96c10 12 10 26 0 38" stroke="#C8102E" stroke-width="6" fill="none" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Avena en hojuelas">
+  <rect width="400" height="300" rx="24" fill="#FFF8F0"/>
+  <circle cx="330" cy="60" r="90" fill="#FFC72C" opacity=".12"/>
+  <ellipse cx="200" cy="238" rx="120" ry="18" fill="#3D1017" opacity=".08"/>
+  <path d="M128 74h144a14 14 0 0 1 14 14v118a18 18 0 0 1-18 18H132a18 18 0 0 1-18-18V88a14 14 0 0 1 14-14Z" fill="#F0DBA8" stroke="#6B1020" stroke-width="6"/>
+  <rect x="146" y="100" width="108" height="60" rx="8" fill="#FFC72C"/>
+  <text x="200" y="128" font-family="Arial, sans-serif" font-size="15" font-weight="900" text-anchor="middle" fill="#3D1017">AVENA</text>
+  <text x="200" y="150" font-family="Arial, sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#6B1020">250 g</text>
+  <g fill="#D9A94F" stroke="#6B1020" stroke-width="2">
+    <ellipse cx="160" cy="196" rx="12" ry="7" transform="rotate(-16 160 196)"/>
+    <ellipse cx="196" cy="206" rx="12" ry="7" transform="rotate(12 196 206)"/>
+    <ellipse cx="234" cy="194" rx="12" ry="7" transform="rotate(-24 234 194)"/>
+    <ellipse cx="178" cy="180" rx="12" ry="7" transform="rotate(30 178 180)"/>
+  </g>
+  <path d="M286 106c10 12 10 28 0 40" stroke="#16A34A" stroke-width="6" fill="none" stroke-linecap="round"/>
+</svg>

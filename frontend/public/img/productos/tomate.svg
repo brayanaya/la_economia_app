@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Tomate chonto">
+  <rect width="400" height="300" rx="24" fill="#FFF8F0"/>
+  <circle cx="70" cy="60" r="90" fill="#16A34A" opacity=".10"/>
+  <ellipse cx="200" cy="238" rx="120" ry="18" fill="#3D1017" opacity=".08"/>
+  <circle cx="160" cy="170" r="52" fill="#D23B2E" stroke="#6B1020" stroke-width="6"/>
+  <circle cx="250" cy="176" r="40" fill="#E04B39" stroke="#6B1020" stroke-width="6"/>
+  <path d="M160 118c-8-12-26-14-30-4s14 10 30 4Zm0 0c8-12 26-14 30-4s-14 10-30 4Z" fill="#2F8F4E"/>
+  <path d="M148 118h24l-12-14Z" fill="#2F8F4E"/>
+  <path d="M250 136c-6-10-20-12-24-3s12 8 24 3Z" fill="#2F8F4E"/>
+  <path d="M170 170c10 8 22 10 32 4" stroke="#B32A20" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <circle cx="142" cy="156" r="7" fill="#FFF6E5" opacity=".5"/>
+  <rect x="140" y="62" width="120" height="28" rx="14" fill="#16A34A"/>
+  <text x="200" y="82" font-family="Arial, sans-serif" font-size="14" font-weight="900" text-anchor="middle" fill="#FFF8F0">TOMATE 500g</text>
+</svg>

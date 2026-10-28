@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Leche">
+  <rect width="400" height="300" rx="24" fill="#FFF8F0"/>
+  <circle cx="70" cy="240" r="90" fill="#C8102E" opacity=".08"/>
+  <ellipse cx="200" cy="240" rx="110" ry="18" fill="#3D1017" opacity=".08"/>
+  <path d="M140 70h50v30h-50z" fill="#E7EBF0" stroke="#6B1020" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M132 100h66l14 22v98a12 12 0 0 1-12 12h-70a12 12 0 0 1-12-12v-98z" fill="#FFFFFF" stroke="#6B1020" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="140" y="130" width="84" height="60" rx="8" fill="#C8102E"/>
+  <path d="M150 148h40l-7 14h-33zM170 140c6 10 6 22 0 32" stroke="#FFF8F0" stroke-width="4" fill="none"/>
+  <text x="182" y="192" font-family="Arial, sans-serif" font-size="15" font-weight="900" text-anchor="middle" fill="#FFF8F0">1 LITRO</text>
+  <path d="M252 118h40v10h-40z" fill="#FFC72C"/>
+  <path d="M258 128h28l8 92a10 10 0 0 1-10 11h-24a10 10 0 0 1-10-11z" fill="#FFF8F0" stroke="#6B1020" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="272" cy="168" r="14" fill="#FFC72C"/>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Jabón de baño">
+  <rect width="400" height="300" rx="24" fill="#FFF8F0"/>
+  <circle cx="70" cy="240" r="90" fill="#C8102E" opacity=".08"/>
+  <ellipse cx="200" cy="236" rx="120" ry="18" fill="#3D1017" opacity=".08"/>
+  <g stroke="#6B1020" stroke-width="6" stroke-linejoin="round">
+    <rect x="120" y="150" width="150" height="58" rx="26" fill="#F6B6C8" transform="rotate(-8 195 179)"/>
+    <rect x="138" y="122" width="150" height="58" rx="26" fill="#FBD3DE" transform="rotate(6 213 151)"/>
+  </g>
+  <ellipse cx="205" cy="150" rx="20" ry="9" fill="#FFF8F0" transform="rotate(6 205 150)"/>
+  <circle cx="286" cy="96" r="22" fill="#FFF6E5" stroke="#6B1020" stroke-width="5"/>
+  <circle cx="286" cy="96" r="8" fill="#FFC72C"/>
+  <rect x="128" y="58" width="130" height="28" rx="14" fill="#C8102E"/>
+  <text x="193" y="78" font-family="Arial, sans-serif" font-size="14" font-weight="900" text-anchor="middle" fill="#FFF8F0">JABÓN 110g</text>
+</svg>

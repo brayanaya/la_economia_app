@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Detergente en polvo">
+  <rect width="400" height="300" rx="24" fill="#FFF8F0"/>
+  <circle cx="330" cy="240" r="90" fill="#C8102E" opacity=".08"/>
+  <ellipse cx="200" cy="240" rx="120" ry="18" fill="#3D1017" opacity=".08"/>
+  <path d="M132 96h136a14 14 0 0 1 14 14v108a18 18 0 0 1-18 18H136a18 18 0 0 1-18-18V110a14 14 0 0 1 14-14Z" fill="#2E6FBE" stroke="#6B1020" stroke-width="6"/>
+  <path d="M138 60h124a8 8 0 0 1 8 8v28H130V68a8 8 0 0 1 8-8Z" fill="#1B4E92" stroke="#6B1020" stroke-width="5"/>
+  <rect x="150" y="124" width="100" height="64" rx="9" fill="#FFF8F0"/>
+  <text x="200" y="150" font-family="Arial, sans-serif" font-size="13" font-weight="900" text-anchor="middle" fill="#1B4E92">DETERGENTE</text>
+  <text x="200" y="172" font-family="Arial, sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#C8102E">500 g</text>
+  <g fill="#FFC72C">
+    <circle cx="164" cy="216" r="6"/><circle cx="192" cy="210" r="6"/><circle cx="222" cy="218" r="6"/><circle cx="248" cy="208" r="6"/>
+  </g>
+  <path d="M110 84c-8 8-8 18 0 26" stroke="#FFC72C" stroke-width="6" fill="none" stroke-linecap="round"/>
+</svg>
