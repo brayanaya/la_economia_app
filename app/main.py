@@ -51,6 +51,8 @@ from app.ordenes.router import router as ordenes_router
 app.include_router(ordenes_router, prefix="/api/v1")
 from app.auth.router import router as auth_router
 app.include_router(auth_router, prefix="/api/v1")
+from app.pagos.router import router as pagos_router
+app.include_router(pagos_router, prefix="/api/v1")
 app.include_router(api_router, prefix=settings.api_v1_prefix)
 
 

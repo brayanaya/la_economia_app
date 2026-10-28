@@ -26,11 +26,45 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     openai_embedding_model: str = "text-embedding-3-small"
 
-    anthropic_api_key: str = ""
+    # ---- IA: generacion de respuestas del agente conversacional ----
+    # llm_provider: "ollama" (local/gratuito), "anthropic" (API de Claude)
+    # o "auto" (Claude si hay API key, si no Ollama; y si ninguno responde,
+    # el agente usa un respondedor determinista con los productos recuperados).
+    llm_provider: str = "auto"
     llm_model: str = "qwen2.5:7b"
+    llm_max_tokens: int = 16000
+    anthropic_api_key: str = ""
+    anthropic_chat_model: str = "claude-opus-5-5"
     umbral_similitud_minima: float = 0.60
     ollama_base_url: str = "http://host.docker.internal:11434"
     ollama_embedding_model: str = "nomic-embed-text"
+
+    # ---- Pagos en linea (Wompi, Colombia) ----
+    # Sin public key configurada los endpoints de pasarela responden 503 y el
+    # checkout solo ofrece "contra entrega" / "Bre-B" (flujo actual).
+    wompi_public_key: str = ""
+    wompi_integrity_secret: str = ""
+    wompi_events_secret: str = ""
+    wompi_ambiente: str = "sandbox"  # "sandbox" | "produccion"
+    wompi_checkout_url: str = "https://checkout.wompi.co/p/"
+    wompi_api_base: str = ""  # se deriva del ambiente si queda vacio
+
+    # URL publica del frontend; se usa para armar el redirect-url de Wompi.
+    app_public_url: str = "http://localhost:3000"
+
+    @property
+    def wompi_api_base_resuelta(self) -> str:
+        """Base de la API de transacciones de Wompi segun el ambiente."""
+        if self.wompi_api_base:
+            return self.wompi_api_base.rstrip("/")
+        if self.wompi_ambiente == "produccion":
+            return "https://production.wompi.co/v1"
+        return "https://sandbox.wompi.co/v1"
+
+    @property
+    def wompi_configurada(self) -> bool:
+        """La pasarela esta lista para iniciar pagos (public key + integridad)."""
+        return bool(self.wompi_public_key and self.wompi_integrity_secret)
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 

@@ -48,6 +48,7 @@ async def crear_orden(payload: OrdenCreate, request: Request, session: CustomerS
         cliente_nombre=payload.cliente_nombre,
         cliente_telefono=payload.cliente_telefono,
         notas=payload.notas,
+        metodo_pago=payload.metodo_pago,
         total=total,
         estado="pendiente",
         items=detalles,

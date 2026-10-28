@@ -1,10 +1,12 @@
 ﻿# carrito-v1
 from datetime import datetime
 from decimal import Decimal
-from typing import List, Optional
+from typing import List, Literal, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
+
+MetodoPago = Literal["contra_entrega", "bre_b", "wompi"]
 
 
 class ItemOrdenIn(BaseModel):
@@ -24,6 +26,7 @@ class OrdenCreate(BaseModel):
     cliente_nombre: str = Field(min_length=2, max_length=120)
     cliente_telefono: Optional[str] = Field(default=None, max_length=30)
     notas: Optional[str] = Field(default=None, max_length=500)
+    metodo_pago: MetodoPago = "contra_entrega"
     items: List[ItemOrdenIn] = Field(min_length=1, max_length=100)
 
 
@@ -48,6 +51,7 @@ class OrdenOut(BaseModel):
     cliente_telefono: Optional[str] = None
     notas: Optional[str] = None
     total: Decimal
+    metodo_pago: Optional[str] = None
     estado: str
     creado_en: datetime
     items: List[DetalleOrdenOut]
@@ -72,6 +76,7 @@ class OrdenConsultaOut(BaseModel):
     sede_id: UUID
     cliente_nombre: str
     total: Decimal
+    metodo_pago: Optional[str] = None
     estado: str
     creado_en: datetime
     items: List[DetalleOrdenPublicoOut]
