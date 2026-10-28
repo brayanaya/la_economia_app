@@ -31,10 +31,10 @@ async def crear(client, **cambios):
     return respuesta.json()
 
 
-async def test_consultar_orden_existente(client):
-    creada = await crear(client)
+async def test_consultar_orden_existente(cliente_autenticado):
+    creada = await crear(cliente_autenticado)
 
-    respuesta = await client.get(f"/api/v1/ordenes/{creada['id']}")
+    respuesta = await cliente_autenticado.get(f"/api/v1/ordenes/{creada['id']}")
 
     assert respuesta.status_code == 200
     data = respuesta.json()
@@ -49,10 +49,10 @@ async def test_consultar_orden_existente(client):
     assert respuesta.headers["cache-control"] == "no-store"
 
 
-async def test_respuesta_publica_no_expone_datos_personales(client):
-    creada = await crear(client)
+async def test_respuesta_publica_no_expone_datos_personales(cliente_autenticado):
+    creada = await crear(cliente_autenticado)
 
-    respuesta = await client.get(f"/api/v1/ordenes/{creada['id']}")
+    respuesta = await cliente_autenticado.get(f"/api/v1/ordenes/{creada['id']}")
 
     assert respuesta.status_code == 200
     assert CAMPOS_PRIVADOS.isdisjoint(respuesta.json().keys())
@@ -73,12 +73,12 @@ async def test_id_con_formato_invalido_devuelve_422(client):
     assert respuesta.status_code == 422
 
 
-async def test_cada_orden_se_consulta_por_su_propio_id(client):
-    a = await crear(client, cliente_nombre="Cliente A")
-    b = await crear(client, cliente_nombre="Cliente B")
+async def test_cada_orden_se_consulta_por_su_propio_id(cliente_autenticado):
+    a = await crear(cliente_autenticado, cliente_nombre="Cliente A")
+    b = await crear(cliente_autenticado, cliente_nombre="Cliente B")
 
-    ra = await client.get(f"/api/v1/ordenes/{a['id']}")
-    rb = await client.get(f"/api/v1/ordenes/{b['id']}")
+    ra = await cliente_autenticado.get(f"/api/v1/ordenes/{a['id']}")
+    rb = await cliente_autenticado.get(f"/api/v1/ordenes/{b['id']}")
 
     assert ra.json()["cliente_nombre"] == "Cliente A"
     assert rb.json()["cliente_nombre"] == "Cliente B"
