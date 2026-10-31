@@ -7,7 +7,7 @@ import ProductoCard from "@/components/ProductoCard";
 import ProductoSkeleton from "@/components/ProductoSkeleton";
 import ChatAgente from "@/components/ChatAgente";
 import FooterCompliance from "@/components/FooterCompliance";
-import { SEDES, buscarProductos, buscarSemantica, type Producto } from "@/lib/api";
+import { SEDES, buscarSemantica, type Producto } from "@/lib/api";
 import { useCarrito } from "@/context/CarritoContext";
 import { ArrowUpRight, Compass, MapPin, Phone, Search, Store } from "lucide-react";
 import SplashScreen from "@/components/SplashScreen";
@@ -52,7 +52,7 @@ function esConsultaFruver(texto: string) {
 }
 
 function esProductoFruver(producto: Producto) {
-  return esConsultaFruver(`${producto.categoria ?? ""} ${producto.nombre}`);
+  return esConsultaFruver(`${producto.nombre}`);
 }
 
 function EstadoVacio({
@@ -112,9 +112,7 @@ export default function Home() {
       setCargando(true);
       setError(null);
       try {
-        const res = consulta === CONSULTA_INICIAL || categoriaActiva !== null
-          ? await buscarSemantica(consulta, sede.id, 8)
-          : await buscarProductos(consulta, sede.id);
+        const res = await buscarSemantica(consulta, sede.id, 8);
         if (!cancelado) setProductos(res);
       } catch {
         if (!cancelado) {
@@ -157,13 +155,12 @@ export default function Home() {
       sedeId: destino.id,
       sedeNombre: destino.nombre,
       imagen: p.imagen,
-      categoria: p.categoria ?? (productoFruver ? "Fruver" : undefined),
     });
     return true;
   }
 
   function manejarRecomendacionChat(p: Producto) {
-    const carritoTieneFruver = itemsCarrito.some((item) => esConsultaFruver(`${item.categoria ?? ""} ${item.nombre}`));
+    const carritoTieneFruver = itemsCarrito.some((item) => esConsultaFruver(`${item.nombre}`));
     if (esProductoFruver(p) || carritoTieneFruver) {
       setSede(SEDE_PALMAS);
       if (SEDE_PALMAS.id) reasignarTodos(SEDE_PALMAS.id, SEDE_PALMAS.nombre);

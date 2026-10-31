@@ -1,14 +1,6 @@
-﻿import uuid
-from typing import Literal
-
 from pydantic import BaseModel, Field
-
-from app.schemas.busqueda import ProductoRecuperado
-
-
-class MensajeHistorial(BaseModel):
-    rol: Literal["usuario", "asistente"]
-    texto: str = Field(..., min_length=1, max_length=1000)
+from typing import Optional, Any
+import uuid
 
 
 class AgenteChatRequest(BaseModel):
@@ -16,15 +8,33 @@ class AgenteChatRequest(BaseModel):
     sede_id: uuid.UUID | None = Field(
         default=None, description="Si se especifica, filtra disponibilidad por stock en esa sede."
     )
-    historial: list[MensajeHistorial] = Field(default_factory=list, max_length=8)
+
+
+class RecetaIngredienteResponse(BaseModel):
+    nombre: str
+    cantidad: str
+    busqueda_catalogo: str
+    obligatorio: bool
+    notas: str = ""
+
+
+class RecetaResponse(BaseModel):
+    id: str
+    nombre: str
+    descripcion: str
+    categoria: str
+    tiempo_min: int
+    porciones: int
+    costo_estimado_cop: float
+    imagen_url: Optional[str] = None
+    ingredientes: list[RecetaIngredienteResponse]
+    pasos: list[str]
+    tags: list[str]
 
 
 class AgenteChatResponse(BaseModel):
     mensaje: str
     respuesta: str
-    productos_recomendados: list[ProductoRecuperado]
+    productos_recomendados: list[Any]
     hubo_resultados_relevantes: bool
-    generado_por_llm: bool = Field(
-        default=False,
-        description="True si la respuesta la redacto un LLM; False si uso el respondedor determinista de respaldo.",
-    )
+    receta: Optional[RecetaResponse] = None

@@ -10,6 +10,7 @@ from app.models.inventario import InventarioSede  # noqa: F401
 from app.models.producto import Producto  # noqa: F401
 from app.models.sede import Sede  # noqa: F401
 from app.models.transaccion_siigo import TransaccionSiigo  # noqa: F401
+from app.ordenes.models import Orden, DetalleOrden  # noqa: F401
 
 __all__ = [
     "Categoria",
@@ -19,6 +20,9 @@ __all__ = [
     "Producto",
     "Sede",
     "TransaccionSiigo",
+    "Orden",
+    "DetalleOrden",
 ]
 
+from app.pagos.models import Pago  # noqa: F401
 from app.auth.models import Customer, CustomerSession  # noqa: F401

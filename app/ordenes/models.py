@@ -18,7 +18,7 @@ class Orden(Base):
     cliente_telefono = Column(String(30), nullable=True)
     notas = Column(String(500), nullable=True)
     total = Column(Numeric(12, 2), nullable=False)
-    # contra_entrega | bre_b | wompi (los pagos en linea viven en la tabla pagos)
+    # contra_entrega | bre_b | wompi
     metodo_pago = Column(String(30), nullable=True)
     estado = Column(String(20), nullable=False, default="pendiente", server_default="pendiente")
     creado_en = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
@@ -29,7 +29,7 @@ class Orden(Base):
         cascade="all, delete-orphan",
         lazy="selectin",
     )
-    pagos = relationship("Pago", back_populates="orden", cascade="all, delete-orphan")
+    pagos = relationship("Pago", back_populates="orden", cascade="all, delete-orphan", lazy="selectin")
 
 
 class DetalleOrden(Base):

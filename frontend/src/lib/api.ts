@@ -10,8 +10,57 @@ export type Sede = { nombre: string; id: string | null };
 export const SEDES: Sede[] = [
   { nombre: "Todas", id: null },
   { nombre: "Santa Isabel", id: "a0000000-0000-0000-0000-000000000001" },
-  { nombre: "Palmas", id: "a0000000-0000-0000-0000-000000000002" }, // nombre comercial de la sede Machines del backend
+  { nombre: "Machines", id: "a0000000-0000-0000-0000-000000000002" },
 ];
+
+// Admin types
+export type VentasResumen = {
+  total_ingresos: number;
+  ordenes_pagadas: number;
+  periodo_dias: number;
+};
+
+export type ProductoStockBajo = {
+  producto_id: string;
+  producto_nombre: string;
+  codigo_barras: string;
+  sede_id: string;
+  sede_nombre: string;
+  stock_actual: number;
+  stock_minimo: number;
+  stock_reservado: number;
+  disponible: number;
+};
+
+export type InventarioEstado = {
+  productos_bajo_stock: ProductoStockBajo[];
+  total_productos_bajo_stock: number;
+};
+
+export type MetricasIA = {
+  busquedas_semanticas: number;
+  interacciones_agente: number;
+  embeddings_productos: number;
+  periodo_dias: number;
+};
+
+export type EstadisticasAdmin = {
+  ventas: VentasResumen;
+  inventario: InventarioEstado;
+  ia: MetricasIA;
+};
+
+export type OrdenReciente = {
+  id: string;
+  ticket_id: string;
+  sede_id: string;
+  sede_nombre: string;
+  cliente_nombre: string;
+  total: number;
+  estado: string;
+  creado_en: string | null;
+  items_count: number;
+};
 
 export type Producto = {
   id: string | number;
@@ -19,9 +68,31 @@ export type Producto = {
   precio: number;
   stock: number;
   sede?: string;
-  categoria?: string;
   imagen?: string;
   similitud?: number; // 0 a 1
+};
+
+// ===== NUEVO: Tipos para Recetas =====
+export type RecetaIngrediente = {
+  nombre: string;
+  cantidad: string;
+  busqueda_catalogo: string;
+  obligatorio: boolean;
+  notas: string;
+};
+
+export type Receta = {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  categoria: string;
+  tiempo_min: number;
+  porciones: number;
+  costo_estimado_cop: number;
+  imagen_url: string | null;
+  ingredientes: RecetaIngrediente[];
+  pasos: string[];
+  tags: string[];
 };
 
 type Raw = Record<string, unknown>;
@@ -39,15 +110,13 @@ export function normalizarProducto(raw: Raw, i = 0): Producto {
     if (!Number.isNaN(s)) similitud = s > 1 ? s / 100 : s;
   }
   const sede = raw.sede ?? raw.sede_nombre;
-  const categoria = raw.categoria ?? raw.categoria_nombre;
   const imagen = raw.imagen ?? raw.imagen_url ?? raw.image;
   return {
     id: (raw.id ?? raw.producto_id ?? i) as string | number,
     nombre: String(raw.nombre ?? raw.name ?? raw.descripcion ?? "Producto"),
     precio: num(raw.precio ?? raw.precio_venta ?? raw.price),
     stock: Number(raw.stock_sede ?? raw.stock ?? 0) || 0,
-    sede: sede ? (String(sede) === "Machines" ? "Palmas" : String(sede)) : undefined,
-    categoria: categoria ? String(categoria) : undefined,
+    sede: sede ? String(sede) : undefined,
     imagen: imagen ? String(imagen) : undefined,
     similitud,
   };
@@ -79,27 +148,41 @@ export async function buscarSemantica(consulta: string, sedeId: string | null, t
   return extraerLista(data).map(normalizarProducto);
 }
 
-export async function buscarProductos(consulta: string, sedeId: string | null): Promise<Producto[]> {
-  const params = new URLSearchParams({ q: consulta });
-  if (sedeId) params.set("sede_id", sedeId);
-  const res = await fetch(`${BASE}/productos/buscar?${params.toString()}`);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return extraerLista(await res.json()).map(normalizarProducto);
-}
-
-export type MensajeHistorial = { rol: "usuario" | "asistente"; texto: string };
-
 export async function chatear(
   mensaje: string,
-  sedeId: string | null,
-  historial: MensajeHistorial[] = []
-): Promise<{ respuesta: string; productos: Producto[]; generadoPorLlm: boolean }> {
-  const data = (await post("/agente/chat", { mensaje, sede_id: sedeId, historial: historial.slice(-8) })) as Raw;
+  sedeId: string | null
+): Promise<{ respuesta: string; productos: Producto[]; receta?: Receta }> {
+  const data = (await post("/agente/chat", { mensaje, sede_id: sedeId })) as Raw;
   const respuesta = String(data.respuesta ?? data.response ?? data.message ?? "No pude generar una respuesta.");
   const productos = extraerLista({ productos: data.productos_recomendados }).map(normalizarProducto);
-  // generado_por_llm ausente cuenta como LLM para no marcar siempre "modo basico".
-  const generadoPorLlm = data.generado_por_llm !== false;
-  return { respuesta, productos, generadoPorLlm };
+  const receta = data.receta ? (data.receta as Raw) : undefined;
+  return { respuesta, productos, receta: receta ? normalizarReceta(receta) : undefined };
+}
+
+function normalizarReceta(raw: Raw): Receta {
+  return {
+    id: String(raw.id ?? ""),
+    nombre: String(raw.nombre ?? ""),
+    descripcion: String(raw.descripcion ?? ""),
+    categoria: String(raw.categoria ?? ""),
+    tiempo_min: num(raw.tiempo_min ?? raw.tiempoMin),
+    porciones: num(raw.porciones),
+    costo_estimado_cop: num(raw.costo_estimado_cop ?? raw.costoEstimadoCop),
+    imagen_url: raw.imagen_url ? String(raw.imagen_url) : null,
+    ingredientes: Array.isArray(raw.ingredientes) ? raw.ingredientes.map((i: unknown) => normalizarIngrediente(i as Raw)) : [],
+    pasos: Array.isArray(raw.pasos) ? raw.pasos.map(String) : [],
+    tags: Array.isArray(raw.tags) ? raw.tags.map(String) : [],
+  };
+}
+
+function normalizarIngrediente(raw: Raw): RecetaIngrediente {
+  return {
+    nombre: String(raw.nombre ?? ""),
+    cantidad: String(raw.cantidad ?? ""),
+    busqueda_catalogo: String(raw.busqueda_catalogo ?? raw.busquedaCatalogo ?? ""),
+    obligatorio: Boolean(raw.obligatorio ?? true),
+    notas: String(raw.notas ?? ""),
+  };
 }
 
 export async function registrarConsentimiento(
@@ -121,4 +204,25 @@ export async function registrarConsentimiento(
   } catch {
     return false;
   }
+}
+
+async function get(path: string): Promise<unknown> {
+  const res = await fetch(`${BASE}${path}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+export async function obtenerEstadisticasAdmin(
+  periodoDias = 30
+): Promise<EstadisticasAdmin> {
+  return (await get(`/admin/estadisticas?periodo_dias=${periodoDias}`)) as EstadisticasAdmin;
+}
+
+export async function obtenerOrdenesRecientes(
+  limite = 10
+): Promise<OrdenReciente[]> {
+  return (await get(`/admin/ordenes-recientes?limite=${limite}`)) as OrdenReciente[];
 }
