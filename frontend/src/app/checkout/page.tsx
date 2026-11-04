@@ -9,13 +9,39 @@ import { useCarrito, type ItemCarrito } from "@/context/CarritoContext";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
 import { mostrarAviso } from "@/lib/aviso";
-import { crearOrden, type OrdenCreada } from "@/lib/ordenes";
+import { crearOrden, type OrdenCreada, type MetodoPago, iniciarPagoWompi } from "@/lib/ordenes";
 import { nombreSede } from "@/lib/sedes";
+import { SafeImage } from "@/components/SafeImage";
+import { QrCode, Smartphone, CreditCard, Truck, Shield } from "lucide-react";
 
 const COP = new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 });
 
-const METODOS_PAGO = ["Contra entrega", "Bre-B"] as const;
-type MetodoPago = (typeof METODOS_PAGO)[number];
+const METODOS_PAGO: { value: MetodoPago; label: string; icon: React.ReactNode; descripcion: string }[] = [
+  { value: "contra_entrega", label: "Contra entrega", icon: <Truck className="w-5 h-5" />, descripcion: "Pagas al recibir (efectivo, Nequi, Daviplata)" },
+  { value: "wompi", label: "Pago en línea (Wompi)", icon: <CreditCard className="w-5 h-5" />, descripcion: "Tarjeta, PSE, Nequi, Bancolombia - Seguro y rápido" },
+  { value: "bre_b", label: "Bre-B", icon: <QrCode className="w-5 h-5" />, descripcion: "Transferencia inmediata entre bancos" },
+];
+
+const CAMPO =
+  "h-12 w-full rounded-[18px] border-2 bg-white px-4 text-[#6B1020] outline-none transition-all duration-200 placeholder:text-[#6B1020]/50 focus:ring-4 focus:ring-[#6B1020]/20";
+const ETIQUETA = "mb-1.5 block text-sm font-black text-[#6B1020]";
+const ERROR = "mt-1.5 text-sm font-bold text-[#B42335]";
+
+function normalizarCelular(valor: string): string {
+  const digitos = valor.replace(/\D/g, "");
+  return digitos.length === 12 && digitos.startsWith("57") ? digitos.slice(2) : digitos;
+}
+
+function validar(v: { nombre: string; telefono: string; direccion: string; acepta: boolean }): Record<string, string> {
+  const e: Record<string, string> = {};
+  if (v.nombre.trim().length < 2) e.nombre = "Ingresa tu nombre completo.";
+  if (!/^3\d{9}$/.test(normalizarCelular(v.telefono))) {
+    e.telefono = "Ingresa un celular colombiano de 10 dígitos, por ejemplo 310 123 4567.";
+  }
+  if (v.direccion.trim().length < 6) e.direccion = "Ingresa una dirección de entrega más completa.";
+  if (!v.acepta) e.acepta = "Debes autorizar el tratamiento de tus datos personales (Ley 1581 de 2012).";
+  return e;
+}
 
 interface GrupoSede {
   sedeId: string;
@@ -31,27 +57,6 @@ interface OrdenConfirmada {
 
 type Errores = Partial<Record<"nombre" | "telefono" | "direccion" | "acepta", string>>;
 
-const CAMPO =
-  "h-12 w-full rounded-[18px] border-2 bg-white px-4 text-[#6B1020] outline-none transition-all duration-200 placeholder:text-[#6B1020]/50 focus:ring-4 focus:ring-[#6B1020]/20";
-const ETIQUETA = "mb-1.5 block text-sm font-black text-[#6B1020]";
-const ERROR = "mt-1.5 text-sm font-bold text-[#B42335]";
-
-function normalizarCelular(valor: string): string {
-  const digitos = valor.replace(/\D/g, "");
-  return digitos.length === 12 && digitos.startsWith("57") ? digitos.slice(2) : digitos;
-}
-
-function validar(v: { nombre: string; telefono: string; direccion: string; acepta: boolean }): Errores {
-  const e: Errores = {};
-  if (v.nombre.trim().length < 2) e.nombre = "Ingresa tu nombre completo.";
-  if (!/^3\d{9}$/.test(normalizarCelular(v.telefono))) {
-    e.telefono = "Ingresa un celular colombiano de 10 dígitos, por ejemplo 310 123 4567.";
-  }
-  if (v.direccion.trim().length < 6) e.direccion = "Ingresa una dirección de entrega más completa.";
-  if (!v.acepta) e.acepta = "Debes autorizar el tratamiento de tus datos personales (Ley 1581 de 2012).";
-  return e;
-}
-
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, hidratado, totalItems, totalPrecio, vaciarSede } = useCarrito();
@@ -63,13 +68,14 @@ export default function CheckoutPage() {
   const [nombre, setNombre] = useState("");
   const [telefono, setTelefono] = useState("");
   const [direccion, setDireccion] = useState("");
-  const [metodo, setMetodo] = useState<MetodoPago>("Contra entrega");
+  const [metodo, setMetodo] = useState<MetodoPago>("contra_entrega");
   const [acepta, setAcepta] = useState(false);
   const [errores, setErrores] = useState<Errores>({});
   const [enviando, setEnviando] = useState(false);
   const [errorGlobal, setErrorGlobal] = useState<string | null>(null);
   const [creadas, setCreadas] = useState<OrdenConfirmada[]>([]);
   const [redirigiendo, setRedirigiendo] = useState(false);
+  const [wompiLoading, setWompiLoading] = useState(false);
 
   const grupos = useMemo<GrupoSede[]>(() => {
     const mapa = new Map<string, GrupoSede>();
@@ -89,13 +95,19 @@ export default function CheckoutPage() {
 
   async function confirmar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (enviando) return;
+    if (enviando || wompiLoading) return;
     if (authLoading || !user) { router.replace("/cuenta?returnTo=%2Fcheckout"); return; }
 
     const nuevos = validar({ nombre, telefono, direccion, acepta });
     setErrores(nuevos);
     setErrorGlobal(null);
     if (Object.keys(nuevos).length > 0) return;
+
+    // If Wompi, initiate payment flow
+    if (metodo === "wompi") {
+      await iniciarPagoWompiFlow();
+      return;
+    }
 
     setEnviando(true);
     const celular = normalizarCelular(telefono);
@@ -109,6 +121,7 @@ export default function CheckoutPage() {
           cliente_nombre: nombre.trim(),
           cliente_telefono: celular,
           notas: `Dirección: ${direccion.trim()} | Pago: ${metodo}`,
+          metodo_pago: metodo,
           items: g.items.map((i) => ({
             producto_id: i.productoId,
             nombre: i.nombre,
@@ -139,15 +152,70 @@ export default function CheckoutPage() {
     }
   }
 
+  async function iniciarPagoWompiFlow() {
+    setWompiLoading(true);
+    setErrorGlobal(null);
+    const celular = normalizarCelular(telefono);
+
+    try {
+      // Create orders first (one per sede)
+      const ordenesCreadas: OrdenConfirmada[] = [];
+      for (const g of grupos) {
+        const orden = await crearOrden({
+          sede_id: g.sedeId,
+          cliente_nombre: nombre.trim(),
+          cliente_telefono: celular,
+          notas: `Dirección: ${direccion.trim()} | Pago: wompi`,
+          metodo_pago: "wompi",
+          items: g.items.map((i) => ({
+            producto_id: i.productoId,
+            nombre: i.nombre,
+            cantidad: i.cantidad,
+            precio_unitario: i.precio,
+            imagen_url: i.imagen ?? null,
+          })),
+        });
+        ordenesCreadas.push({ orden, sedeNombre: g.sedeNombre });
+        vaciarSede(g.sedeId);
+      }
+
+      // For now, use the first order to initiate Wompi payment
+      // In a multi-sede scenario, we'd need to handle multiple payments
+      const primeraOrden = ordenesCreadas[0];
+      const { accion, campos } = await iniciarPagoWompi(primeraOrden.orden.id);
+
+      // Redirect to Wompi checkout via form POST
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = accion;
+      form.style.display = "none";
+      for (const [key, value] of Object.entries(campos)) {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = key;
+        input.value = value;
+        form.appendChild(input);
+      }
+      document.body.appendChild(form);
+      form.submit();
+    } catch (err) {
+      setErrorGlobal(err instanceof Error ? err.message : "Error al iniciar el pago con Wompi");
+      mostrarAviso("No pudimos iniciar el pago. Inténtalo de nuevo.");
+    } finally {
+      setWompiLoading(false);
+    }
+  }
+
   const completo = creadas.length > 0 && items.length === 0;
+
+  const metodoActual = METODOS_PAGO.find(m => m.value === metodo)!;
 
   return (
     <div className="min-h-screen bg-white">
       <header className="border-b-4 border-[#8B1E2D] bg-[#6B1020]">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-2 px-4 py-3">
           <Link href="/" className="flex min-w-0 items-center gap-2 sm:gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="La Economía Aya" className="h-8 w-auto sm:h-10" />
+            <SafeImage src="/logo.png" alt="La Economía Aya" width={80} height={32} className="h-8 w-auto sm:h-10" fallbackType="general" />
             <span className="hidden text-lg font-black tracking-tight text-white sm:inline">La Economía Aya</span>
           </Link>
           <Link
@@ -179,38 +247,23 @@ export default function CheckoutPage() {
               aria-live="polite"
               className="anim-aparecer mx-auto max-w-2xl rounded-[25px] border-2 border-[#6B1020] bg-white p-8 text-center shadow-xl sm:p-10"
             >
-              <div
-                aria-hidden="true"
-                className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full border-2 border-[#6B1020] bg-[#F3E6D9] text-4xl font-black text-[#6B1020]"
-              >
-                ✓
-              </div>
+              <div aria-hidden="true" className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full border-2 border-[#6B1020] bg-[#F3E6D9] text-4xl font-black text-[#6B1020]">✓</div>
               <h1 className="text-4xl font-black leading-none tracking-tight text-[#6B1020]">¡Pedidos confirmados!</h1>
               <p className="mt-3 text-[#6B1020]/80">
-                Gracias, {nombre.trim()}. Guardamos tus pedidos con el método de pago <strong>{metodo}</strong>.
+                Gracias, {nombre.trim()}. Guardamos tus pedidos con el método de pago <strong>{metodoActual.label}</strong>.
               </p>
               <ul className="mt-6 space-y-2 text-left">
                 {creadas.map(({ orden, sedeNombre }) => (
                   <li key={orden.id} className="rounded-[18px] border-2 border-[#F3E6D9] p-4 text-[#6B1020]">
-                    <Link
-                      href={`/pedidos/${orden.id}`}
-                      className="font-black underline underline-offset-2 hover:text-[#8B1E2D]"
-                    >
+                    <Link href={`/pedidos/${orden.id}`} className="font-black underline underline-offset-2 hover:text-[#8B1E2D]">
                       Pedido #{orden.id.slice(0, 8).toUpperCase()}
                     </Link>
-                    <span className="block text-sm">
-                      Sede {sedeNombre} · {COP.format(Number(orden.total))}
-                    </span>
+                    <span className="block text-sm">Sede {sedeNombre} · {COP.format(Number(orden.total))}</span>
                   </li>
                 ))}
               </ul>
-              <p className="mt-4 text-sm text-[#6B1020]/70">
-                Entrega en: {direccion.trim()} · Contacto: {telefono.trim()}
-              </p>
-              <Link
-                href="/"
-                className="mt-8 inline-block rounded-[52px] border-2 border-[#6B1020] bg-[#6B1020] px-8 py-3 font-black text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#8B1E2D] active:scale-95"
-              >
+              <p className="mt-4 text-sm text-[#6B1020]/70">Entrega en: {direccion.trim()} · Contacto: {telefono.trim()}</p>
+              <Link href="/" className="mt-8 inline-block rounded-[52px] border-2 border-[#6B1020] bg-[#6B1020] px-8 py-3 font-black text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#8B1E2D] active:scale-95">
                 Seguir comprando
               </Link>
             </section>
@@ -226,140 +279,108 @@ export default function CheckoutPage() {
 
           {hidratado && items.length > 0 && (
             <>
-              <h1 className="text-4xl font-black leading-none tracking-tight text-[#6B1020] sm:text-5xl">
-                Finalizar compra
-              </h1>
-              <p className="mb-8 mt-3 font-semibold text-[#6B1020]/70">
-                Revisa tu pedido y completa tus datos de entrega.
-              </p>
+              <h1 className="text-4xl font-black leading-none tracking-tight text-[#6B1020] sm:text-5xl">Finalizar compra</h1>
+              <p className="mb-8 mt-3 font-semibold text-[#6B1020]/70">Revisa tu pedido y completa tus datos de entrega.</p>
 
               {creadas.length > 0 && (
                 <div className="mb-6 rounded-[18px] border-2 border-[#6B1020] bg-white p-4 text-sm text-[#6B1020]">
                   <p className="font-black">Estos pedidos ya quedaron registrados:</p>
                   <ul className="mt-1">
                     {creadas.map(({ orden, sedeNombre }) => (
-                      <li key={orden.id}>
-                        #{orden.id.slice(0, 8).toUpperCase()} · Sede {sedeNombre}
-                      </li>
+                      <li key={orden.id}>#{orden.id.slice(0, 8).toUpperCase()} · Sede {sedeNombre}</li>
                     ))}
                   </ul>
                 </div>
               )}
 
               <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
-                <form
-                  onSubmit={confirmar}
-                  noValidate
-                  aria-label="Datos de entrega y pago"
-                  className="space-y-5 rounded-[25px] border-2 border-[#6B1020] bg-white p-6 shadow-xl sm:p-8"
-                >
+                <form onSubmit={confirmar} noValidate aria-label="Datos de entrega y pago" className="space-y-5 rounded-[25px] border-2 border-[#6B1020] bg-white p-6 shadow-xl sm:p-8">
                   <div>
                     <label htmlFor="nombre" className={ETIQUETA}>Nombre completo</label>
-                    <input
-                      id="nombre"
-                      value={nombre}
-                      onChange={(ev) => setNombre(ev.target.value)}
-                      maxLength={120}
-                      autoComplete="name"
-                      aria-invalid={Boolean(errores.nombre)}
-                      aria-describedby={errores.nombre ? "nombre-error" : undefined}
-                      className={`${CAMPO} ${errores.nombre ? "border-[#B42335]" : "border-[#6B1020]"}`}
-                    />
+                    <input id="nombre" value={nombre} onChange={(ev) => setNombre(ev.target.value)} maxLength={120} autoComplete="name" aria-invalid={Boolean(errores.nombre)} aria-describedby={errores.nombre ? "nombre-error" : undefined} className={`${CAMPO} ${errores.nombre ? "border-[#B42335]" : "border-[#6B1020]"}`} />
                     {errores.nombre && <p id="nombre-error" role="alert" className={ERROR}>{errores.nombre}</p>}
                   </div>
 
                   <div>
                     <label htmlFor="telefono" className={ETIQUETA}>Teléfono celular</label>
-                    <input
-                      id="telefono"
-                      value={telefono}
-                      onChange={(ev) => setTelefono(ev.target.value)}
-                      maxLength={20}
-                      inputMode="tel"
-                      autoComplete="tel"
-                      placeholder="310 123 4567"
-                      aria-invalid={Boolean(errores.telefono)}
-                      aria-describedby={errores.telefono ? "telefono-error" : undefined}
-                      className={`${CAMPO} ${errores.telefono ? "border-[#B42335]" : "border-[#6B1020]"}`}
-                    />
+                    <input id="telefono" value={telefono} onChange={(ev) => setTelefono(ev.target.value)} maxLength={20} inputMode="tel" autoComplete="tel" placeholder="310 123 4567" aria-invalid={Boolean(errores.telefono)} aria-describedby={errores.telefono ? "telefono-error" : undefined} className={`${CAMPO} ${errores.telefono ? "border-[#B42335]" : "border-[#6B1020]"}`} />
                     {errores.telefono && <p id="telefono-error" role="alert" className={ERROR}>{errores.telefono}</p>}
                   </div>
 
                   <div>
                     <label htmlFor="direccion" className={ETIQUETA}>Dirección de entrega</label>
-                    <input
-                      id="direccion"
-                      value={direccion}
-                      onChange={(ev) => setDireccion(ev.target.value)}
-                      maxLength={200}
-                      autoComplete="street-address"
-                      placeholder="Calle, número, barrio"
-                      aria-invalid={Boolean(errores.direccion)}
-                      aria-describedby={errores.direccion ? "direccion-error" : undefined}
-                      className={`${CAMPO} ${errores.direccion ? "border-[#B42335]" : "border-[#6B1020]"}`}
-                    />
+                    <input id="direccion" value={direccion} onChange={(ev) => setDireccion(ev.target.value)} maxLength={200} autoComplete="street-address" placeholder="Calle, número, barrio" aria-invalid={Boolean(errores.direccion)} aria-describedby={errores.direccion ? "direccion-error" : undefined} className={`${CAMPO} ${errores.direccion ? "border-[#B42335]" : "border-[#6B1020]"}`} />
                     {errores.direccion && <p id="direccion-error" role="alert" className={ERROR}>{errores.direccion}</p>}
                   </div>
 
                   <div>
                     <label htmlFor="metodo" className={ETIQUETA}>Método de pago</label>
-                    <select
-                      id="metodo"
-                      value={metodo}
-                      disabled={authLoading || !user}
-                      onChange={(ev) => setMetodo(ev.target.value as MetodoPago)}
-                      className={`${CAMPO} border-[#6B1020]`}
-                    >
+                    <div className="grid gap-3 sm:grid-cols-3">
                       {METODOS_PAGO.map((m) => (
-                        <option key={m} value={m}>{m}</option>
+                        <label key={m.value} className={`relative cursor-pointer rounded-[18px] border-2 p-4 transition-all ${metodo === m.value ? "border-[#6B1020] bg-[#6B1020]/5" : "border-[#F3E6D9] hover:border-[#6B1020]/50"}`}>
+                          <input
+                            type="radio"
+                            name="metodo"
+                            value={m.value}
+                            checked={metodo === m.value}
+                            onChange={() => setMetodo(m.value)}
+                            className="sr-only"
+                            disabled={authLoading || !user}
+                          />
+                          <div className={`flex items-start gap-3 ${metodo === m.value ? "text-white" : "text-[#6B1020]"}`}>
+                            <div className={`shrink-0 flex h-10 w-10 items-center justify-center rounded-full ${metodo === m.value ? "bg-white/20" : "bg-[#F3E6D9]"}`}>{m.icon}</div>
+                            <div>
+                              <p className="font-black">{m.label}</p>
+                              <p className="text-xs opacity-80">{m.descripcion}</p>
+                            </div>
+                          </div>
+                          {metodo === m.value && <div className="absolute -bottom-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-white text-[#6B1020] text-xs font-black">✓</div>}
+                        </label>
                       ))}
-                    </select>
-                    {metodo === "Bre-B" && (
-                      <p className="mt-2 rounded-[18px] border-2 border-[#6B1020]/20 bg-[#F3E6D9] p-3 text-sm text-[#6B1020]">
-                        El comercio debe compartirte su QR Bre-B oficial para completar el pago. Verifica que el destinatario sea La Economía Aya antes de transferir; este pedido no genera un QR ni confirma el pago automáticamente.
-                      </p>
+                    </div>
+
+                    {metodo === "bre_b" && (
+                      <div className="mt-3 rounded-[18px] border-2 border-[#6B1020]/20 bg-[#F3E6D9] p-3">
+                        <div className="flex items-start gap-3">
+                          <Smartphone className="shrink-0 mt-0.5 h-5 w-5 text-[#6B1020]" />
+                          <div className="text-sm text-[#6B1020]">
+                            <p className="font-black">Pago con Bre-B</p>
+                            <p>El comercio te compartirá su QR Bre-B oficial para completar la transferencia. Verifica que el destinatario sea <strong>La Economía Aya</strong> antes de transferir; este pedido no genera un QR ni confirma el pago automáticamente.</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {metodo === "wompi" && (
+                      <div className="mt-3 rounded-[18px] border-2 border-[#8B1E2D]/20 bg-[#8B1E2D]/5 p-3">
+                        <div className="flex items-start gap-3">
+                          <Shield className="shrink-0 mt-0.5 h-5 w-5 text-[#8B1E2D]" />
+                          <div className="text-sm text-[#6B1020]">
+                            <p className="font-black">Pago seguro con Wompi</p>
+                            <p>Serás redirigido al checkout seguro de Wompi (tarjeta débito/crédito, PSE, Nequi, Bancolombia). Tu información financiera nunca pasa por nuestros servidores.</p>
+                          </div>
+                        </div>
+                      </div>
                     )}
                   </div>
 
                   <div>
                     <label className="flex cursor-pointer items-start gap-3 text-sm text-[#6B1020]">
-                      <input
-                        type="checkbox"
-                        checked={acepta}
-                        onChange={(ev) => setAcepta(ev.target.checked)}
-                        aria-invalid={Boolean(errores.acepta)}
-                        aria-describedby={errores.acepta ? "acepta-error" : undefined}
-                        className="mt-0.5 h-4 w-4 accent-[#6B1020]"
-                      />
+                      <input type="checkbox" checked={acepta} onChange={(ev) => setAcepta(ev.target.checked)} aria-invalid={Boolean(errores.acepta)} aria-describedby={errores.acepta ? "acepta-error" : undefined} className="mt-0.5 h-4 w-4 accent-[#6B1020]" />
                       <span>Autorizo el tratamiento de mis datos personales para gestionar este pedido (Ley 1581 de 2012).</span>
                     </label>
-                    <p className="ml-7 mt-1 text-xs">
-                      <Link href="/privacidad" target="_blank" className="font-bold text-[#6B1020] underline underline-offset-2">
-                        Leer la política de privacidad
-                      </Link>
-                    </p>
+                    <p className="ml-7 mt-1 text-xs"><Link href="/privacidad" target="_blank" className="font-bold text-[#6B1020] underline underline-offset-2">Leer la política de privacidad</Link></p>
                     {errores.acepta && <p id="acepta-error" role="alert" className={ERROR}>{errores.acepta}</p>}
                   </div>
 
-                  {errorGlobal && (
-                    <p role="alert" className="rounded-[18px] border-2 border-[#B42335] bg-white p-3 text-sm font-bold text-[#B42335]">
-                      {errorGlobal}
-                    </p>
-                  )}
+                  {errorGlobal && <p role="alert" className="rounded-[18px] border-2 border-[#B42335] bg-white p-3 text-sm font-bold text-[#B42335]">{errorGlobal}</p>}
 
-                  <button
-                    type="submit"
-                    disabled={enviando}
-                    className="h-14 w-full rounded-[52px] border-2 border-[#6B1020] bg-[#6B1020] text-lg font-black text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#8B1E2D] active:scale-95 disabled:cursor-wait disabled:opacity-70 disabled:active:scale-100"
-                  >
-                    {enviando ? "Procesando…" : `Confirmar pedido · ${COP.format(totalPrecio)}`}
+                  <button type="submit" disabled={enviando || wompiLoading} className="h-14 w-full rounded-[52px] border-2 border-[#6B1020] bg-[#6B1020] text-lg font-black text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#8B1E2D] active:scale-95 disabled:cursor-wait disabled:opacity-70 disabled:active:scale-100">
+                    {wompiLoading ? "Redirigiendo a Wompi…" : enviando ? "Procesando…" : `Confirmar pedido · ${COP.format(totalPrecio)}`}
                   </button>
                 </form>
 
-                <aside
-                  aria-label="Resumen del pedido"
-                  className="h-fit rounded-[25px] border-2 border-[#6B1020] bg-white p-6 lg:sticky lg:top-6"
-                >
+                <aside aria-label="Resumen del pedido" className="h-fit rounded-[25px] border-2 border-[#6B1020] bg-white p-6 lg:sticky lg:top-6">
                   <h2 className="text-2xl font-black leading-none tracking-tight text-[#6B1020]">Tu pedido</h2>
                   {grupos.map((g) => (
                     <section key={g.sedeId} className="mt-5">
@@ -367,27 +388,19 @@ export default function CheckoutPage() {
                       <ul className="mt-2 divide-y-2 divide-[#F3E6D9]">
                         {g.items.map((it) => (
                           <li key={`${it.sedeId}-${it.productoId}`} className="flex items-start justify-between gap-3 py-2 text-sm text-[#6B1020]">
-                            <span>
-                              {it.nombre} <span className="font-black">× {it.cantidad}</span>
-                            </span>
+                            <span>{it.nombre} <span className="font-black">× {it.cantidad}</span></span>
                             <span className="font-bold">{COP.format(it.precio * it.cantidad)}</span>
                           </li>
                         ))}
                       </ul>
-                      <p className="mt-1 text-right text-sm font-semibold text-[#6B1020]/80">
-                        Subtotal: {COP.format(g.subtotal)}
-                      </p>
+                      <p className="mt-1 text-right text-sm font-semibold text-[#6B1020]/80">Subtotal: {COP.format(g.subtotal)}</p>
                     </section>
                   ))}
                   <div className="mt-5 flex items-center justify-between border-t-2 border-[#6B1020] pt-4">
                     <span className="font-bold text-[#6B1020]">Total ({totalItems} uds.)</span>
                     <span className="text-2xl font-black tracking-tight text-[#6B1020]">{COP.format(totalPrecio)}</span>
                   </div>
-                  {grupos.length > 1 && (
-                    <p className="mt-3 text-xs font-medium text-[#6B1020]/70">
-                      Tu carrito tiene productos de {grupos.length} sedes: se creará un pedido por cada sede.
-                    </p>
-                  )}
+                  {grupos.length > 1 && <p className="mt-3 text-xs font-medium text-[#6B1020]/70">Tu carrito tiene productos de {grupos.length} sedes: se creará un pedido por cada sede.</p>}
                 </aside>
               </div>
             </>

@@ -4,21 +4,24 @@ from decimal import Decimal
 CAMPOS_PRIVADOS = {"cliente_telefono", "notas"}
 
 
+# UUID fijo de sede de prueba (coincide con mock catalog)
+SEDE_TEST_UUID = "a0000000-0000-0000-0000-000000000001"
+
 def payload_orden(**cambios):
     base = {
-        "sede_id": str(uuid.uuid4()),
+        "sede_id": SEDE_TEST_UUID,
         "cliente_nombre": "Cliente Prueba",
         "cliente_telefono": "3101234567",
         "notas": "Direccion: Calle 10 # 5-20, Neiva | Pago: Nequi",
         "items": [
             {
-                "producto_id": "p-1",
-                "nombre": "Leche Entera 1L",
+                "producto_id": "prod_011",  # Leche Entera Alpina 1L
+                "nombre": "Leche Entera Alpina",
                 "cantidad": 2,
-                "precio_unitario": 4500,
-                "imagen_url": "/logo.png",
+                "precio_unitario": 4800,
+                "imagen_url": "/images/leche_alpina.jpg",
             },
-            {"producto_id": "p-2", "nombre": "Pan Tajado", "cantidad": 1, "precio_unitario": 1500},
+            {"producto_id": "prod_028", "nombre": "Pan Francés", "cantidad": 1, "precio_unitario": 1200},
         ],
     }
     base.update(cambios)
@@ -42,8 +45,8 @@ async def test_consultar_orden_existente(cliente_autenticado):
     assert data["sede_id"] == creada["sede_id"]
     assert data["estado"] == "pendiente"
     assert data["cliente_nombre"] == "Cliente Prueba"
-    assert Decimal(data["total"]) == Decimal("10500.00")
-    assert {i["nombre"] for i in data["items"]} == {"Leche Entera 1L", "Pan Tajado"}
+    assert Decimal(data["total"]) == Decimal("10800.00")
+    assert {i["nombre"] for i in data["items"]} == {"Leche Entera Alpina", "Pan Francés"}
     for item in data["items"]:
         assert set(item) == {"nombre", "imagen_url", "cantidad", "precio_unitario", "subtotal"}
     assert respuesta.headers["cache-control"] == "no-store"

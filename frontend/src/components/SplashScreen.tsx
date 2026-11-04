@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { SafeImage } from "@/components/SafeImage";
 import { useEffect, useState } from "react";
 
 export default function SplashScreen() {
@@ -25,13 +25,14 @@ export default function SplashScreen() {
       className={`fixed inset-0 z-[100] flex items-center justify-center bg-black transition-opacity duration-500 ease-out ${leaving ? "pointer-events-none opacity-0" : "opacity-100"}`}
     >
       <div className={`flex flex-col items-center transition-transform duration-500 ease-out ${leaving ? "scale-95" : "scale-100"}`}>
-        <Image
+        <SafeImage
           src="/logo.png"
           alt="La Economía Aya"
           width={280}
           height={280}
           priority
           className="h-auto w-48 animate-soft-pulse object-contain sm:w-56"
+          fallbackType="general"
         />
         <span className="mt-8 text-[10px] font-medium uppercase tracking-[0.3em] text-white/55">Preparando tu mercado</span>
       </div>

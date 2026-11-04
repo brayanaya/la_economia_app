@@ -58,7 +58,7 @@ def _firmar_evento(evento, secreto):
 
 
 async def test_monto_centavos():
-    assert monto_centavos(Decimal("10500.00")) == 1050000
+    assert monto_centavos(Decimal("10800.00")) == 1080000
     assert monto_centavos(Decimal("0.99")) == 99
     assert monto_centavos(Decimal("1.005")) == 101  # redondeo half-up: 1.005 * 100 = 100.5 -> 101
 
@@ -88,10 +88,10 @@ async def test_iniciar_pago_devuelve_formulario_con_firma(cliente_autenticado, m
     campos = inicio["campos"]
     assert campos["public-key"] == "pub_test_xyz"
     assert campos["currency"] == "COP"
-    assert campos["amount-in-cents"] == "1050000"  # total 10500.00 de payload_orden
+    assert campos["amount-in-cents"] == "1080000"  # total 10800.00 de payload_orden
     assert campos["reference"] == inicio["pago"]["referencia"]
     assert campos["integrity-sing"] == construir_firma_integridad(
-        1050000, "COP", campos["reference"], "integ_test"
+        1080000, "COP", campos["reference"], "integ_test"
     )
     assert campos["redirect-url"] == f"{settings.app_public_url}/pedidos/{orden['id']}"
 
@@ -109,7 +109,8 @@ async def test_iniciar_pago_devuelve_formulario_con_firma(cliente_autenticado, m
 async def test_pagar_orden_ajena_da_403(fabrica_clientes, monkeypatch):
     monkeypatch.setattr(settings, "wompi_public_key", "pub_test_xyz")
     monkeypatch.setattr(settings, "wompi_integrity_secret", "integ_test")
-    crear_cliente = await fabrica_clientes
+    # fabrica_clientes es ya la función _crear (yielded por el fixture async)
+    crear_cliente = fabrica_clientes
     dueno = await crear_cliente("dueno@test.local")
     intruso = await crear_cliente("intruso@test.local")
 
@@ -130,7 +131,7 @@ async def test_webhook_con_checksum_valido_aprueba(client, cliente_autenticado, 
     inicio = await _iniciar_pago(cliente_autenticado, orden["id"])
     referencia = inicio["pago"]["referencia"]
 
-    evento = _firmar_evento(_evento_wompi(referencia, 1050000), secreto)
+    evento = _firmar_evento(_evento_wompi(referencia, 1080000), secreto)
     respuesta = await client.post("/api/v1/pagos/webhook/wompi", json=evento)
     assert respuesta.status_code == 200, respuesta.text
     assert respuesta.json()["ok"] is True
@@ -150,7 +151,7 @@ async def test_webhook_con_checksum_invalido_da_401(client, cliente_autenticado,
     orden = await _crear_orden(cliente_autenticado)
     inicio = await _iniciar_pago(cliente_autenticado, orden["id"])
 
-    evento = _firmar_evento(_evento_wompi(inicio["pago"]["referencia"], 1050000), "otro-secreto")
+    evento = _firmar_evento(_evento_wompi(inicio["pago"]["referencia"], 1080000), "otro-secreto")
     respuesta = await client.post("/api/v1/pagos/webhook/wompi", json=evento)
     assert respuesta.status_code == 401
 
@@ -170,10 +171,10 @@ async def test_webhook_aprueba_solo_si_la_api_lo_confirma(client, cliente_autent
     inicio = await _iniciar_pago(cliente_autenticado, orden["id"])
     referencia = inicio["pago"]["referencia"]
 
-    evento = _evento_wompi(referencia, 1050000)
+    evento = _evento_wompi(referencia, 1080000)
 
     async def _verificacion_aprobada(transaccion_id):
-        return {"status": "APPROVED", "amount_in_cents": 1050000, "reference": referencia}
+        return {"status": "APPROVED", "amount_in_cents": 1080000, "reference": referencia}
 
     monkeypatch.setattr(router_pagos, "consultar_transaccion", _verificacion_aprobada)
     respuesta = await client.post("/api/v1/pagos/webhook/wompi", json=evento)
@@ -193,10 +194,10 @@ async def test_webhook_no_aprueba_si_la_api_disiente(client, cliente_autenticado
     inicio = await _iniciar_pago(cliente_autenticado, orden["id"])
 
     async def _verificacion_declinada(transaccion_id):
-        return {"status": "DECLINED", "amount_in_cents": 1050000, "reference": inicio["pago"]["referencia"]}
+        return {"status": "DECLINED", "amount_in_cents": 1080000, "reference": inicio["pago"]["referencia"]}
 
     monkeypatch.setattr(router_pagos, "consultar_transaccion", _verificacion_declinada)
-    evento = _evento_wompi(inicio["pago"]["referencia"], 1050000, estado="APPROVED")
+    evento = _evento_wompi(inicio["pago"]["referencia"], 1080000, estado="APPROVED")
     respuesta = await client.post("/api/v1/pagos/webhook/wompi", json=evento)
     assert respuesta.status_code == 200
 
@@ -228,7 +229,7 @@ async def test_webhook_rechaza_monto_adulterado(client, cliente_autenticado, mon
 
 async def test_webhook_ignora_referencias_desconocidas(client, monkeypatch):
     monkeypatch.setattr(settings, "wompi_events_secret", "evento_test")
-    evento = _firmar_evento(_evento_wompi("LEA-NOEXISTE-99", 1050000), "evento_test")
+    evento = _firmar_evento(_evento_wompi("LEA-NOEXISTE-99", 1080000), "evento_test")
     respuesta = await client.post("/api/v1/pagos/webhook/wompi", json=evento)
     assert respuesta.status_code == 200
     assert "ignorado" in respuesta.json()["detalle"]

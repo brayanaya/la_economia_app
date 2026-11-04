@@ -52,6 +52,23 @@ class Settings(BaseSettings):
     # URL publica del frontend; se usa para armar el redirect-url de Wompi.
     app_public_url: str = "http://localhost:3000"
 
+    # ---- Catálogo: Proveedor y estado de conexión ----
+    # CATALOG_CONNECTED: true = intentar conectar a MasControl real
+    #                    false = usar MockProvider (solo desarrollo)
+    catalog_connected: bool = False
+    # Proveedor a usar: "auto" | "mock" | "mascontrol"
+    # "auto": usa MasControl si CATALOG_CONNECTED=true y está configurado, sino Mock (solo dev)
+    catalogo_provider: str = "auto"
+    # Variables MasControl (pendientes de configuración real)
+    mascontrol_api_url: str = ""
+    mascontrol_client_id: str = ""
+    mascontrol_client_secret: str = ""
+    # Opcional: base de datos directa / SFTP si MasControl no expone API
+    mascontrol_db_host: str = ""
+    mascontrol_db_user: str = ""
+    mascontrol_db_password: str = ""
+    mascontrol_db_name: str = ""
+
     @property
     def wompi_api_base_resuelta(self) -> str:
         """Base de la API de transacciones de Wompi segun el ambiente."""

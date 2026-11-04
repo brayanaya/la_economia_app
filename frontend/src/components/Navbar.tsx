@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { SafeImage } from "@/components/SafeImage";
 import Link from "next/link";
 import { ShoppingCart, UserRound } from "lucide-react";
 
@@ -15,7 +15,7 @@ export default function Navbar({ cartCount = 0, onCartClick, onAccountClick }: P
     <header className="fixed left-1/2 top-4 z-50 w-[95%] max-w-7xl -translate-x-1/2 text-white">
       <div className="mx-auto flex w-full flex-wrap items-center justify-between gap-x-5 gap-y-3 rounded-2xl bg-[#570008]/85 px-4 py-3 shadow-[0_12px_40px_rgba(35,0,5,0.28)] backdrop-blur-xl sm:px-7 sm:py-4">
         <a href="#inicio" aria-label="La Economía Aya, inicio" className="flex shrink-0 items-center transition-all duration-300 ease-in-out hover:-translate-y-1 hover:opacity-90">
-          <Image src="/logo.png" alt="La Economía Aya" width={150} height={50} priority className="h-12 w-auto object-contain sm:h-14" />
+          <SafeImage src="/logo.png" alt="La Economía Aya" width={150} height={50} priority className="h-12 w-auto object-contain sm:h-14" fallbackType="general" />
         </a>
 
         <nav aria-label="Navegación principal" className="order-3 flex w-full items-center justify-center gap-5 overflow-x-auto text-sm font-semibold text-white/85 sm:order-none sm:w-auto sm:gap-7 sm:text-base">

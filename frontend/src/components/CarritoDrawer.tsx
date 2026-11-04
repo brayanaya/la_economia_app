@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { useCarrito, type ItemCarrito } from "@/context/CarritoContext";
 import { nombreSede } from "@/lib/sedes";
+import { SafeProductImage } from "@/components/SafeImage";
 
 const COP = new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 });
 
@@ -65,12 +66,13 @@ export default function CarritoDrawer() {
               <ul className="divide-y-2 divide-[#F3E6D9]">
                 {g.items.map((it) => (
                   <li key={`${it.sedeId}-${it.productoId}`} className="flex items-center gap-3 py-3">
-                    {it.imagen ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={it.imagen} alt={it.nombre} className="h-14 w-14 rounded-[12px] border-2 border-[#F3E6D9] object-cover" />
-                    ) : (
-                      <div className="h-14 w-14 rounded-[12px] bg-[#F3E6D9]" aria-hidden="true" />
-                    )}
+                    <SafeProductImage
+                      src={it.imagen}
+                      alt={it.nombre}
+                      width={56}
+                      height={56}
+                      className="rounded-[12px] border-2 border-[#F3E6D9] object-cover"
+                    />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-bold text-[#6B1020]">{it.nombre}</p>
                       <p className="text-xs text-[#6B1020]/70">{COP.format(it.precio)} c/u</p>

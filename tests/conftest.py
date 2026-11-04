@@ -16,6 +16,9 @@ from app.ordenes.models import DetalleOrden, Orden
 from app.ordenes.router import router as ordenes_router
 from app.pagos.models import Pago
 from app.pagos.router import router as pagos_router
+from app.core.catalog_state import get_catalogo_state
+from app.services.providers import get_proveedor_catalogo
+from app.services.providers.mock_provider import mock_provider
 
 
 @pytest_asyncio.fixture
@@ -63,9 +66,16 @@ async def _sembrar_cliente(session_factory, email="cliente@test.local"):
 
 def _armar_app() -> FastAPI:
     """App minima con los routers que usan los tests (ordenes + pagos)."""
+    from app.core.catalog_state import CatalogoStateManager, CatalogoEstado
     app = FastAPI()
     app.include_router(ordenes_router, prefix="/api/v1")
     app.include_router(pagos_router, prefix="/api/v1")
+    # Override proveedor de catálogo para usar MockProvider en tests
+    app.dependency_overrides[get_proveedor_catalogo] = lambda: mock_provider
+    # Override estado de catálogo para tests: marcar como conectado para permitir creación de órdenes
+    test_catalog_state = CatalogoStateManager()
+    test_catalog_state._estado = CatalogoEstado.CONECTADO
+    app.dependency_overrides[get_catalogo_state] = lambda: test_catalog_state
     return app
 
 

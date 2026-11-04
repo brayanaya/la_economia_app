@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { SafeProductImage } from "@/components/SafeImage";
 
 type Props = {
   nombre: string;
@@ -47,17 +48,15 @@ export default function ProductoCard({ nombre, precio, imagen, stock, similitud,
         </span>
       )}
 
-      <div className="mb-3 flex h-40 items-center justify-center overflow-hidden rounded-[18px] bg-[#F3E6D9]">
-        {imagen ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={imagen}
-            alt={nombre}
-            className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : (
-          <span className="text-4xl">🛒</span>
-        )}
+      <div className="mb-3 relative flex h-40 items-center justify-center overflow-hidden rounded-[18px] bg-[#F3E6D9]">
+        <SafeProductImage
+          src={imagen}
+          alt={nombre}
+          fill
+          className="object-contain transition-transform duration-300 group-hover:scale-105"
+          sizes="100%"
+        />
+
       </div>
 
       <h3 className="line-clamp-2 min-h-10 text-sm font-bold leading-snug text-[#6B1020]">{nombre}</h3>

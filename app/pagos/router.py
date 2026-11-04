@@ -1,6 +1,7 @@
 # carrito-v1
 import logging
 import secrets
+import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy import select
@@ -35,7 +36,7 @@ router = APIRouter(prefix="/pagos", tags=["Pagos"])
     summary="Inicia el pago en linea (Wompi) de una orden propia y devuelve el formulario de redireccion",
 )
 async def iniciar_pago(
-    orden_id,
+    orden_id: uuid.UUID,
     payload: IniciarPagoIn,
     request: Request,
     session: CustomerSession = Depends(current_session),
@@ -102,7 +103,7 @@ async def configuracion_pagos(response: Response) -> ConfiguracionPagoOut:
     response_model=EstadoPagoOut,
     summary="Estado de pago de una orden (vista publica del ticket)",
 )
-async def estado_pago(orden_id, response: Response, db: AsyncSession = Depends(get_db)) -> EstadoPagoOut:
+async def estado_pago(orden_id: uuid.UUID, response: Response, db: AsyncSession = Depends(get_db)) -> EstadoPagoOut:
     orden = await obtener_orden(db, orden_id)
     if orden is None:
         raise HTTPException(status_code=404, detail="Pedido no encontrado")

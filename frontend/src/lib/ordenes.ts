@@ -11,11 +11,14 @@ export interface ItemOrdenPayload {
   imagen_url?: string | null;
 }
 
+export type MetodoPago = "contra_entrega" | "bre_b" | "wompi";
+
 export interface OrdenPayload {
   sede_id: string;
   cliente_nombre: string;
   cliente_telefono?: string | null;
   notas?: string | null;
+  metodo_pago?: MetodoPago;
   items: ItemOrdenPayload[];
 }
 
@@ -45,6 +48,7 @@ export interface OrdenConsulta {
   estado: string;
   creado_en: string;
   items: DetalleOrdenConsulta[];
+  metodo_pago?: string | null;
 }
 
 function mensajeError(detail: unknown): string {
@@ -97,4 +101,83 @@ export async function consultarOrden(id: string, signal?: AbortSignal): Promise<
   if (res.status === 404) throw new PedidoNoEncontradoError();
   if (!res.ok) throw new Error("No se pudo consultar el pedido");
   return (await res.json()) as OrdenConsulta;
+}
+
+export interface InicioPagoWompi {
+  pago: {
+    id: string;
+    estado: string;
+    referencia: string;
+    monto_centavos: number;
+    moneda: string;
+    transaccion_id?: string | null;
+    creado_en: string;
+  };
+  accion: string;
+  campos: Record<string, string>;
+}
+
+export async function iniciarPagoWompi(ordenId: string): Promise<InicioPagoWompi> {
+  const res = await fetch(`${ORDENES_API}/pagos/ordenes/${encodeURIComponent(ordenId)}/iniciar`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...(getCsrfToken() ? { "X-CSRF-Token": getCsrfToken()! } : {}),
+    },
+    body: JSON.stringify({ metodo: "wompi" }),
+  });
+  if (!res.ok) {
+    let detail: unknown = null;
+    try { detail = ((await res.json()) as { detail?: unknown }).detail; } catch {}
+    if (typeof detail === "string" && detail.includes("pasarela de pago en linea no esta configurada")) {
+      throw new Error("El pago en línea no está disponible en este momento. Puedes usar contra entrega o Bre-B.");
+    }
+    throw new Error(typeof detail === "string" ? detail : "No se pudo iniciar el pago con Wompi");
+  }
+  return (await res.json()) as InicioPagoWompi;
+}
+
+export async function consultarEstadoPago(ordenId: string, signal?: AbortSignal): Promise<{
+  orden_id: string;
+  orden_estado: string;
+  metodo?: string | null;
+  pasarela_configurada: boolean;
+  pago?: {
+    id: string;
+    estado: string;
+    referencia: string;
+    monto_centavos: number;
+    moneda: string;
+    transaccion_id?: string | null;
+    creado_en: string;
+  } | null;
+}> {
+  const res = await fetch(`${ORDENES_API}/pagos/ordenes/${encodeURIComponent(ordenId)}`, {
+    cache: "no-store",
+    signal,
+  });
+  if (res.status === 404) throw new PedidoNoEncontradoError();
+  if (!res.ok) throw new Error("No se pudo consultar el estado del pago");
+  return (await res.json()) as {
+    orden_id: string;
+    orden_estado: string;
+    metodo?: string | null;
+    pasarela_configurada: boolean;
+    pago?: {
+      id: string;
+      estado: string;
+      referencia: string;
+      monto_centavos: number;
+      moneda: string;
+      transaccion_id?: string | null;
+      creado_en: string;
+    } | null;
+  };
+}
+
+export async function obtenerConfiguracionPagos(): Promise<{ pasarela_configurada: boolean }> {
+  const res = await fetch(`${ORDENES_API}/pagos/configuracion`, { cache: "no-store" });
+  if (!res.ok) throw new Error("No se pudo obtener la configuración de pagos");
+  return (await res.json()) as { pasarela_configurada: boolean };
 }

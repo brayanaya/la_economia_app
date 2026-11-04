@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { OrdenConsulta } from "@/lib/ordenes";
 import { nombreSede } from "@/lib/sedes";
+import { SafeProductImage } from "@/components/SafeImage";
 
 const COP = new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 });
 const FECHA = new Intl.DateTimeFormat("es-CO", {
@@ -114,16 +115,13 @@ export default function TicketPedido({ orden, nuevo }: { orden: OrdenConsulta; n
           <ul className="divide-y-2 divide-[#F3E6D9]">
             {orden.items.map((it, i) => (
               <li key={`${it.nombre}-${i}`} className="flex items-center gap-3 py-3">
-                {it.imagen_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={it.imagen_url}
-                    alt=""
-                    className="h-12 w-12 rounded-[12px] border-2 border-[#F3E6D9] object-cover"
-                  />
-                ) : (
-                  <div className="h-12 w-12 rounded-[12px] bg-[#F3E6D9]" aria-hidden="true" />
-                )}
+                <SafeProductImage
+                  src={it.imagen_url}
+                  alt={it.nombre}
+                  width={48}
+                  height={48}
+                  className="rounded-[12px] border-2 border-[#F3E6D9] object-cover"
+                />
                 <div className="min-w-0 flex-1 text-[#6B1020]">
                   <p className="truncate text-sm font-bold">{it.nombre}</p>
                   <p className="text-xs text-[#6B1020]/70">
