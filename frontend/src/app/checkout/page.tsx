@@ -212,7 +212,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="border-b-4 border-[#8B1E2D] bg-[#6B1020]">
+      <header className="border-b-3 border-black bg-gradient-to-r from-[#3f0791] via-[#5b0cb5] to-[#e30ba6]">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-2 px-4 py-3">
           <Link href="/" className="flex min-w-0 items-center gap-2 sm:gap-3">
             <SafeImage src="/logo.png" alt="La Economía Aya" width={80} height={32} className="h-8 w-auto sm:h-10" fallbackType="general" />
@@ -220,50 +220,50 @@ export default function CheckoutPage() {
           </Link>
           <Link
             href="/"
-            className="shrink-0 whitespace-nowrap rounded-[52px] border-2 border-white/80 px-3 py-1.5 text-xs font-black text-white transition-all duration-200 hover:bg-white hover:text-[#6B1020] active:scale-95 sm:px-4 sm:text-sm"
+            className="shrink-0 whitespace-nowrap rounded-xl border-2 border-black bg-white px-3 py-1.5 text-xs font-black text-black transition-all duration-200 shadow-[2px_2px_0_0_#000000] hover:bg-gray-100 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none sm:px-4 sm:text-sm"
           >
             ← Volver a la tienda
           </Link>
         </div>
       </header>
 
-      <main className="bg-[#F3E6D9]">
+      <main className="bg-gradient-to-b from-[#faf7ff] via-[#fff5fb] to-[#f4eeff]">
         <div className="mx-auto max-w-5xl px-4 py-10">
-          {!hidratado && <div aria-busy="true" className="h-96 animate-pulse rounded-[25px] bg-white/60" />}
+          {!hidratado && <div aria-busy="true" className="h-96 animate-pulse rounded-2xl bg-white/60 border-2 border-black" />}
 
           {redirigiendo && (
             <div
               role="status"
               aria-live="polite"
-              className="mx-auto max-w-2xl rounded-[25px] border-2 border-[#6B1020] bg-white p-10 text-center shadow-xl"
+              className="mx-auto max-w-2xl rounded-2xl border-3 border-black bg-white p-10 text-center shadow-[8px_8px_0_0_#3f0791]"
             >
-              <p className="text-2xl font-black leading-none tracking-tight text-[#6B1020]">Pedido registrado</p>
-              <p className="mt-2 text-[#6B1020]/80">Abriendo tu ticket…</p>
+              <p className="text-2xl font-black leading-none tracking-tight text-[#3f0791]">Pedido registrado</p>
+              <p className="mt-2 text-black/80 font-bold">Abriendo tu ticket…</p>
             </div>
           )}
 
           {hidratado && completo && (
             <section
               aria-live="polite"
-              className="anim-aparecer mx-auto max-w-2xl rounded-[25px] border-2 border-[#6B1020] bg-white p-8 text-center shadow-xl sm:p-10"
+              className="anim-aparecer mx-auto max-w-2xl rounded-3xl border-3 border-black bg-white p-8 text-center shadow-[8px_8px_0_0_#3f0791] sm:p-10"
             >
-              <div aria-hidden="true" className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full border-2 border-[#6B1020] bg-[#F3E6D9] text-4xl font-black text-[#6B1020]">✓</div>
-              <h1 className="text-4xl font-black leading-none tracking-tight text-[#6B1020]">¡Pedidos confirmados!</h1>
-              <p className="mt-3 text-[#6B1020]/80">
-                Gracias, {nombre.trim()}. Guardamos tus pedidos con el método de pago <strong>{metodoActual.label}</strong>.
+              <div aria-hidden="true" className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-2xl border-2 border-black bg-[#ffcc00] text-4xl font-black text-[#3f0791] shadow-[3px_3px_0_0_#000000]">✓</div>
+              <h1 className="text-4xl font-black leading-none tracking-tight text-black">¡Pedidos confirmados!</h1>
+              <p className="mt-3 text-gray-700 font-bold">
+                Gracias, {nombre.trim()}. Guardamos tus pedidos con el método de pago <strong className="text-[#3f0791]">{metodoActual.label}</strong>.
               </p>
               <ul className="mt-6 space-y-2 text-left">
                 {creadas.map(({ orden, sedeNombre }) => (
-                  <li key={orden.id} className="rounded-[18px] border-2 border-[#F3E6D9] p-4 text-[#6B1020]">
-                    <Link href={`/pedidos/${orden.id}`} className="font-black underline underline-offset-2 hover:text-[#8B1E2D]">
+                  <li key={orden.id} className="rounded-xl border-2 border-black p-4 bg-[#faf7ff] text-black shadow-[2px_2px_0_0_#000000]">
+                    <Link href={`/pedidos/${orden.id}`} className="font-black text-[#3f0791] underline underline-offset-2 hover:text-[#e30ba6]">
                       Pedido #{orden.id.slice(0, 8).toUpperCase()}
                     </Link>
-                    <span className="block text-sm">Sede {sedeNombre} · {COP.format(Number(orden.total))}</span>
+                    <span className="block text-sm font-bold mt-1">Sede {sedeNombre} · {COP.format(Number(orden.total))}</span>
                   </li>
                 ))}
               </ul>
-              <p className="mt-4 text-sm text-[#6B1020]/70">Entrega en: {direccion.trim()} · Contacto: {telefono.trim()}</p>
-              <Link href="/" className="mt-8 inline-block rounded-[52px] border-2 border-[#6B1020] bg-[#6B1020] px-8 py-3 font-black text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#8B1E2D] active:scale-95">
+              <p className="mt-4 text-sm font-medium text-gray-600">Entrega en: {direccion.trim()} · Contacto: {telefono.trim()}</p>
+              <Link href="/" className="mt-8 inline-block rounded-xl border-2 border-black bg-[#3f0791] px-8 py-3 font-black text-white transition-all shadow-[4px_4px_0_0_#e30ba6] hover:-translate-y-0.5 hover:bg-[#320575] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none">
                 Seguir comprando
               </Link>
             </section>
@@ -279,13 +279,13 @@ export default function CheckoutPage() {
 
           {hidratado && items.length > 0 && (
             <>
-              <h1 className="text-4xl font-black leading-none tracking-tight text-[#6B1020] sm:text-5xl">Finalizar compra</h1>
-              <p className="mb-8 mt-3 font-semibold text-[#6B1020]/70">Revisa tu pedido y completa tus datos de entrega.</p>
+              <h1 className="text-4xl font-black leading-none tracking-tight text-black sm:text-5xl">Finalizar compra</h1>
+              <p className="mb-8 mt-2 font-bold text-[#3f0791]">Revisa tu pedido y completa tus datos de entrega en Neiva.</p>
 
               {creadas.length > 0 && (
-                <div className="mb-6 rounded-[18px] border-2 border-[#6B1020] bg-white p-4 text-sm text-[#6B1020]">
-                  <p className="font-black">Estos pedidos ya quedaron registrados:</p>
-                  <ul className="mt-1">
+                <div className="mb-6 rounded-2xl border-2 border-black bg-white p-4 text-sm text-black shadow-[3px_3px_0_0_#3f0791]">
+                  <p className="font-black text-[#3f0791]">Estos pedidos ya quedaron registrados:</p>
+                  <ul className="mt-1 font-bold">
                     {creadas.map(({ orden, sedeNombre }) => (
                       <li key={orden.id}>#{orden.id.slice(0, 8).toUpperCase()} · Sede {sedeNombre}</li>
                     ))}
@@ -294,30 +294,30 @@ export default function CheckoutPage() {
               )}
 
               <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
-                <form onSubmit={confirmar} noValidate aria-label="Datos de entrega y pago" className="space-y-5 rounded-[25px] border-2 border-[#6B1020] bg-white p-6 shadow-xl sm:p-8">
+                <form onSubmit={confirmar} noValidate aria-label="Datos de entrega y pago" className="space-y-5 rounded-3xl border-3 border-black bg-white p-6 shadow-[8px_8px_0_0_#3f0791] sm:p-8">
                   <div>
-                    <label htmlFor="nombre" className={ETIQUETA}>Nombre completo</label>
-                    <input id="nombre" value={nombre} onChange={(ev) => setNombre(ev.target.value)} maxLength={120} autoComplete="name" aria-invalid={Boolean(errores.nombre)} aria-describedby={errores.nombre ? "nombre-error" : undefined} className={`${CAMPO} ${errores.nombre ? "border-[#B42335]" : "border-[#6B1020]"}`} />
-                    {errores.nombre && <p id="nombre-error" role="alert" className={ERROR}>{errores.nombre}</p>}
+                    <label htmlFor="nombre" className="mb-1.5 block text-xs font-black uppercase tracking-wider text-[#3f0791]">Nombre completo</label>
+                    <input id="nombre" value={nombre} onChange={(ev) => setNombre(ev.target.value)} maxLength={120} autoComplete="name" aria-invalid={Boolean(errores.nombre)} aria-describedby={errores.nombre ? "nombre-error" : undefined} className={`h-12 w-full rounded-xl border-2 bg-white px-4 text-black font-medium outline-none transition-all shadow-[2px_2px_0_0_#3f0791] focus:ring-2 focus:ring-[#e30ba6]/30 ${errores.nombre ? "border-red-600" : "border-black"}`} />
+                    {errores.nombre && <p id="nombre-error" role="alert" className="mt-1.5 text-xs font-bold text-red-600">{errores.nombre}</p>}
                   </div>
 
                   <div>
-                    <label htmlFor="telefono" className={ETIQUETA}>Teléfono celular</label>
-                    <input id="telefono" value={telefono} onChange={(ev) => setTelefono(ev.target.value)} maxLength={20} inputMode="tel" autoComplete="tel" placeholder="310 123 4567" aria-invalid={Boolean(errores.telefono)} aria-describedby={errores.telefono ? "telefono-error" : undefined} className={`${CAMPO} ${errores.telefono ? "border-[#B42335]" : "border-[#6B1020]"}`} />
-                    {errores.telefono && <p id="telefono-error" role="alert" className={ERROR}>{errores.telefono}</p>}
+                    <label htmlFor="telefono" className="mb-1.5 block text-xs font-black uppercase tracking-wider text-[#3f0791]">Teléfono celular</label>
+                    <input id="telefono" value={telefono} onChange={(ev) => setTelefono(ev.target.value)} maxLength={20} inputMode="tel" autoComplete="tel" placeholder="310 123 4567" aria-invalid={Boolean(errores.telefono)} aria-describedby={errores.telefono ? "telefono-error" : undefined} className={`h-12 w-full rounded-xl border-2 bg-white px-4 text-black font-medium outline-none transition-all shadow-[2px_2px_0_0_#3f0791] focus:ring-2 focus:ring-[#e30ba6]/30 ${errores.telefono ? "border-red-600" : "border-black"}`} />
+                    {errores.telefono && <p id="telefono-error" role="alert" className="mt-1.5 text-xs font-bold text-red-600">{errores.telefono}</p>}
                   </div>
 
                   <div>
-                    <label htmlFor="direccion" className={ETIQUETA}>Dirección de entrega</label>
-                    <input id="direccion" value={direccion} onChange={(ev) => setDireccion(ev.target.value)} maxLength={200} autoComplete="street-address" placeholder="Calle, número, barrio" aria-invalid={Boolean(errores.direccion)} aria-describedby={errores.direccion ? "direccion-error" : undefined} className={`${CAMPO} ${errores.direccion ? "border-[#B42335]" : "border-[#6B1020]"}`} />
-                    {errores.direccion && <p id="direccion-error" role="alert" className={ERROR}>{errores.direccion}</p>}
+                    <label htmlFor="direccion" className="mb-1.5 block text-xs font-black uppercase tracking-wider text-[#3f0791]">Dirección de entrega en Neiva</label>
+                    <input id="direccion" value={direccion} onChange={(ev) => setDireccion(ev.target.value)} maxLength={200} autoComplete="street-address" placeholder="Ej: Calle 10 Sur #21-92, Barrio Santa Isabel" aria-invalid={Boolean(errores.direccion)} aria-describedby={errores.direccion ? "direccion-error" : undefined} className={`h-12 w-full rounded-xl border-2 bg-white px-4 text-black font-medium outline-none transition-all shadow-[2px_2px_0_0_#3f0791] focus:ring-2 focus:ring-[#e30ba6]/30 ${errores.direccion ? "border-red-600" : "border-black"}`} />
+                    {errores.direccion && <p id="direccion-error" role="alert" className="mt-1.5 text-xs font-bold text-red-600">{errores.direccion}</p>}
                   </div>
 
                   <div>
-                    <label htmlFor="metodo" className={ETIQUETA}>Método de pago</label>
+                    <label htmlFor="metodo" className="mb-2 block text-xs font-black uppercase tracking-wider text-[#3f0791]">Método de pago flexible</label>
                     <div className="grid gap-3 sm:grid-cols-3">
                       {METODOS_PAGO.map((m) => (
-                        <label key={m.value} className={`relative cursor-pointer rounded-[18px] border-2 p-4 transition-all ${metodo === m.value ? "border-[#6B1020] bg-[#6B1020]/5" : "border-[#F3E6D9] hover:border-[#6B1020]/50"}`}>
+                        <label key={m.value} className={`relative cursor-pointer rounded-2xl border-2 p-3.5 transition-all ${metodo === m.value ? "border-black bg-[#3f0791] text-white shadow-[4px_4px_0_0_#e30ba6]" : "border-black/20 bg-white text-black hover:border-black shadow-sm"}`}>
                           <input
                             type="radio"
                             name="metodo"
@@ -327,37 +327,51 @@ export default function CheckoutPage() {
                             className="sr-only"
                             disabled={authLoading || !user}
                           />
-                          <div className={`flex items-start gap-3 ${metodo === m.value ? "text-white" : "text-[#6B1020]"}`}>
-                            <div className={`shrink-0 flex h-10 w-10 items-center justify-center rounded-full ${metodo === m.value ? "bg-white/20" : "bg-[#F3E6D9]"}`}>{m.icon}</div>
+                          <div className="flex flex-col gap-2">
+                            <div className="flex items-center justify-between">
+                              <div className={`flex h-9 w-9 items-center justify-center rounded-xl border-2 border-black ${metodo === m.value ? "bg-[#ffcc00] text-black" : "bg-[#faf7ff] text-[#3f0791]"}`}>{m.icon}</div>
+                              {metodo === m.value && <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#ffcc00] text-black text-xs font-black border border-black">✓</div>}
+                            </div>
                             <div>
-                              <p className="font-black">{m.label}</p>
-                              <p className="text-xs opacity-80">{m.descripcion}</p>
+                              <p className="font-black text-sm">{m.label}</p>
+                              <p className={`text-[11px] leading-tight font-medium mt-0.5 ${metodo === m.value ? "text-white/85" : "text-gray-500"}`}>{m.descripcion}</p>
                             </div>
                           </div>
-                          {metodo === m.value && <div className="absolute -bottom-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-white text-[#6B1020] text-xs font-black">✓</div>}
                         </label>
                       ))}
                     </div>
 
                     {metodo === "bre_b" && (
-                      <div className="mt-3 rounded-[18px] border-2 border-[#6B1020]/20 bg-[#F3E6D9] p-3">
+                      <div className="mt-3 rounded-2xl border-2 border-black bg-gradient-to-r from-[#faf7ff] to-[#fff0fa] p-4 shadow-[2px_2px_0_0_#3f0791]">
                         <div className="flex items-start gap-3">
-                          <Smartphone className="shrink-0 mt-0.5 h-5 w-5 text-[#6B1020]" />
-                          <div className="text-sm text-[#6B1020]">
-                            <p className="font-black">Pago con Bre-B</p>
-                            <p>El comercio te compartirá su QR Bre-B oficial para completar la transferencia. Verifica que el destinatario sea <strong>La Economía Aya</strong> antes de transferir; este pedido no genera un QR ni confirma el pago automáticamente.</p>
+                          <Smartphone className="shrink-0 mt-0.5 h-5 w-5 text-[#3f0791]" />
+                          <div className="text-xs text-black font-medium leading-relaxed">
+                            <p className="font-black text-sm text-[#3f0791]">Transferencia Inmediata Bre-B</p>
+                            <p className="mt-0.5">Al confirmar, obtendrás el ticket con el código QR y las llaves oficiales del comercio (Celular y Llave Alfanumérica) para transferir desde cualquier banco sin comisiones.</p>
                           </div>
                         </div>
                       </div>
                     )}
 
                     {metodo === "wompi" && (
-                      <div className="mt-3 rounded-[18px] border-2 border-[#8B1E2D]/20 bg-[#8B1E2D]/5 p-3">
+                      <div className="mt-3 rounded-2xl border-2 border-black bg-white p-4 shadow-[2px_2px_0_0_#3f0791]">
                         <div className="flex items-start gap-3">
-                          <Shield className="shrink-0 mt-0.5 h-5 w-5 text-[#8B1E2D]" />
-                          <div className="text-sm text-[#6B1020]">
-                            <p className="font-black">Pago seguro con Wompi</p>
-                            <p>Serás redirigido al checkout seguro de Wompi (tarjeta débito/crédito, PSE, Nequi, Bancolombia). Tu información financiera nunca pasa por nuestros servidores.</p>
+                          <Shield className="shrink-0 mt-0.5 h-5 w-5 text-[#3f0791]" />
+                          <div className="text-xs text-black font-medium leading-relaxed">
+                            <p className="font-black text-sm text-[#3f0791]">Pago Cifrado con Wompi</p>
+                            <p className="mt-0.5">Serás redirigido al Web Checkout protegido de Wompi con firma criptográfica de integridad SHA-256 (PSE, Bancolombia, Nequi, tarjetas de crédito y débito).</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {metodo === "contra_entrega" && (
+                      <div className="mt-3 rounded-2xl border-2 border-black bg-white p-4 shadow-[2px_2px_0_0_#3f0791]">
+                        <div className="flex items-start gap-3">
+                          <Truck className="shrink-0 mt-0.5 h-5 w-5 text-[#3f0791]" />
+                          <div className="text-xs text-black font-medium leading-relaxed">
+                            <p className="font-black text-sm text-[#3f0791]">Pago al Recibir en Domicilio</p>
+                            <p className="mt-0.5">El repartidor de La Economía Aya llevará datáfono y código QR para recibir en efectivo o billeteras digitales en tu puerta.</p>
                           </div>
                         </div>
                       </div>
@@ -365,42 +379,42 @@ export default function CheckoutPage() {
                   </div>
 
                   <div>
-                    <label className="flex cursor-pointer items-start gap-3 text-sm text-[#6B1020]">
-                      <input type="checkbox" checked={acepta} onChange={(ev) => setAcepta(ev.target.checked)} aria-invalid={Boolean(errores.acepta)} aria-describedby={errores.acepta ? "acepta-error" : undefined} className="mt-0.5 h-4 w-4 accent-[#6B1020]" />
-                      <span>Autorizo el tratamiento de mis datos personales para gestionar este pedido (Ley 1581 de 2012).</span>
+                    <label className="flex cursor-pointer items-start gap-3 text-xs text-black font-bold">
+                      <input type="checkbox" checked={acepta} onChange={(ev) => setAcepta(ev.target.checked)} aria-invalid={Boolean(errores.acepta)} aria-describedby={errores.acepta ? "acepta-error" : undefined} className="mt-0.5 h-4 w-4 accent-[#3f0791] border-2 border-black rounded" />
+                      <span>Autorizo el tratamiento de mis datos personales para gestionar este pedido (Ley 1581 de 2012 - Habeas Data).</span>
                     </label>
-                    <p className="ml-7 mt-1 text-xs"><Link href="/privacidad" target="_blank" className="font-bold text-[#6B1020] underline underline-offset-2">Leer la política de privacidad</Link></p>
-                    {errores.acepta && <p id="acepta-error" role="alert" className={ERROR}>{errores.acepta}</p>}
+                    <p className="ml-7 mt-1 text-[11px]"><Link href="/privacidad" target="_blank" className="font-bold text-[#3f0791] underline underline-offset-2">Consultar la política de privacidad</Link></p>
+                    {errores.acepta && <p id="acepta-error" role="alert" className="mt-1 text-xs font-bold text-red-600">{errores.acepta}</p>}
                   </div>
 
-                  {errorGlobal && <p role="alert" className="rounded-[18px] border-2 border-[#B42335] bg-white p-3 text-sm font-bold text-[#B42335]">{errorGlobal}</p>}
+                  {errorGlobal && <p role="alert" className="rounded-xl border-2 border-black bg-red-100 p-3 text-xs font-bold text-red-800">{errorGlobal}</p>}
 
-                  <button type="submit" disabled={enviando || wompiLoading} className="h-14 w-full rounded-[52px] border-2 border-[#6B1020] bg-[#6B1020] text-lg font-black text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#8B1E2D] active:scale-95 disabled:cursor-wait disabled:opacity-70 disabled:active:scale-100">
-                    {wompiLoading ? "Redirigiendo a Wompi…" : enviando ? "Procesando…" : `Confirmar pedido · ${COP.format(totalPrecio)}`}
+                  <button type="submit" disabled={enviando || wompiLoading} className="w-full rounded-2xl border-2 border-black bg-[#3f0791] py-4 text-base font-black text-white transition-all shadow-[4px_4px_0_0_#e30ba6] hover:-translate-y-0.5 hover:bg-[#320575] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none disabled:cursor-wait disabled:opacity-70 flex items-center justify-center gap-2">
+                    {wompiLoading ? "Conectando con Wompi…" : enviando ? "Procesando pedido…" : `Confirmar pedido · ${COP.format(totalPrecio)}`}
                   </button>
                 </form>
 
-                <aside aria-label="Resumen del pedido" className="h-fit rounded-[25px] border-2 border-[#6B1020] bg-white p-6 lg:sticky lg:top-6">
-                  <h2 className="text-2xl font-black leading-none tracking-tight text-[#6B1020]">Tu pedido</h2>
+                <aside aria-label="Resumen del pedido" className="h-fit rounded-3xl border-3 border-black bg-white p-6 shadow-[6px_6px_0_0_#3f0791] lg:sticky lg:top-6">
+                  <h2 className="text-2xl font-black leading-none tracking-tight text-black">Tu pedido</h2>
                   {grupos.map((g) => (
                     <section key={g.sedeId} className="mt-5">
-                      <h3 className="text-xs font-black uppercase tracking-wide text-[#8B1E2D]">Sede {g.sedeNombre}</h3>
-                      <ul className="mt-2 divide-y-2 divide-[#F3E6D9]">
+                      <h3 className="text-xs font-black uppercase tracking-wide text-[#3f0791] bg-[#faf7ff] px-2 py-1 rounded border border-black/10 inline-block">Sede {g.sedeNombre}</h3>
+                      <ul className="mt-2 divide-y border-t border-b border-black/10">
                         {g.items.map((it) => (
-                          <li key={`${it.sedeId}-${it.productoId}`} className="flex items-start justify-between gap-3 py-2 text-sm text-[#6B1020]">
+                          <li key={`${it.sedeId}-${it.productoId}`} className="flex items-start justify-between gap-3 py-2 text-xs text-black">
                             <span>{it.nombre} <span className="font-black">× {it.cantidad}</span></span>
                             <span className="font-bold">{COP.format(it.precio * it.cantidad)}</span>
                           </li>
                         ))}
                       </ul>
-                      <p className="mt-1 text-right text-sm font-semibold text-[#6B1020]/80">Subtotal: {COP.format(g.subtotal)}</p>
+                      <p className="mt-1 text-right text-xs font-bold text-gray-700">Subtotal: {COP.format(g.subtotal)}</p>
                     </section>
                   ))}
-                  <div className="mt-5 flex items-center justify-between border-t-2 border-[#6B1020] pt-4">
-                    <span className="font-bold text-[#6B1020]">Total ({totalItems} uds.)</span>
-                    <span className="text-2xl font-black tracking-tight text-[#6B1020]">{COP.format(totalPrecio)}</span>
+                  <div className="mt-5 flex items-center justify-between border-t-2 border-black pt-4">
+                    <span className="font-bold text-black text-sm">Total ({totalItems} uds.)</span>
+                    <span className="text-2xl font-black tracking-tight text-[#3f0791]">{COP.format(totalPrecio)}</span>
                   </div>
-                  {grupos.length > 1 && <p className="mt-3 text-xs font-medium text-[#6B1020]/70">Tu carrito tiene productos de {grupos.length} sedes: se creará un pedido por cada sede.</p>}
+                  {grupos.length > 1 && <p className="mt-3 text-xs font-medium text-gray-500">Tu carrito tiene productos de {grupos.length} sedes: se generará un pedido por cada sede.</p>}
                 </aside>
               </div>
             </>

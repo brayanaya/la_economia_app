@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     auth_cookie_name: str = "la_economia_session"
     auth_cookie_secure: bool = True
     auth_session_ttl_seconds: int = 1209600
+    google_client_id: str = ""
     cors_origins: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000", "http://192.168.56.1:3000", "http://localhost:8081"]
 
     postgres_user: str
