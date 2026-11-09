@@ -1,12 +1,31 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { chatear, type Producto, type Receta, type Presupuesto, type Comparacion, type CartAction, type CartActionAdd, type CartActionRemove, type CartActionUpdate, type CartActionClear, type CartActionList, type CartActionConfirmClear } from "@/lib/api";
+import { useEffect, useRef, useState, useCallback } from "react";
+import {
+  chatear,
+  obtenerConversaciones,
+  obtenerConversacion,
+  eliminarConversacion,
+  type Producto,
+  type Receta,
+  type Presupuesto,
+  type Comparacion,
+  type CartAction,
+  type CartActionAdd,
+  type CartActionRemove,
+  type CartActionUpdate,
+  type CartActionClear,
+  type CartActionList,
+  type CartActionConfirmClear,
+  type ConversacionItem,
+} from "@/lib/api";
 import { useCarrito } from "@/context/CarritoContext";
+import { useAuth } from "@/context/AuthContext";
 import { mostrarAviso } from "@/lib/aviso";
 import { SafeImage, SafeProductImage, SafeIngredientImage, SafeRecipeImage } from "@/components/SafeImage";
 
 const CLAVE_CONSENTIMIENTO_IA = "la_economia_ia_consent_v1";
+const CLAVE_CONVERSACION_ID = "la_economia_ia_conversacion_id_v1";
 
 type Mensaje = {
   rol: "usuario" | "asistente";
@@ -32,8 +51,19 @@ function leerConsentimiento(): boolean {
 }
 function guardarConsentimiento(valor: boolean) { try { window.localStorage.setItem(CLAVE_CONSENTIMIENTO_IA, String(valor)); } catch {} }
 
+function leerConversacionId(): string | null {
+  try { return window.localStorage.getItem(CLAVE_CONVERSACION_ID); } catch { return null; }
+}
+function guardarConversacionId(id: string | null) {
+  try {
+    if (id) window.localStorage.setItem(CLAVE_CONVERSACION_ID, id);
+    else window.localStorage.removeItem(CLAVE_CONVERSACION_ID);
+  } catch {}
+}
+
 export default function ChatAgente({ sedeId, onAgregar }: Props) {
   const { agregar, quitar, cambiarCantidad, vaciar, vaciarSede, items } = useCarrito();
+  const { user } = useAuth();
   const [abierto, setAbierto] = useState(false);
   const [input, setInput] = useState("");
   const [cargando, setCargando] = useState(false);
@@ -50,14 +80,89 @@ export default function ChatAgente({ sedeId, onAgregar }: Props) {
   const [presupuestoError, setPresupuestoError] = useState<string | null>(null);
   // Estado para comparación modal
   const [productosComparacionSeleccionados, setProductosComparacionSeleccionados] = useState<Set<string>>(new Set());
+  // Estado para persistencia y lista de conversaciones (Bloque 3)
+  const [conversacionId, setConversacionId] = useState<string | null>(null);
+  const [panelHistorialAbierto, setPanelHistorialAbierto] = useState(false);
+  const [listaConversaciones, setListaConversaciones] = useState<ConversacionItem[]>([]);
+  const [cargandoHistorial, setCargandoHistorial] = useState(false);
+
   const temporizador = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [mensajes, setMensajes] = useState<Mensaje[]>([
     { rol: "asistente", texto: "¡Hola! Soy **Aya**, tu asistente de compras en La Economía Aya 😊\n\n¿En qué te ayudo hoy? ¿Buscas algo para cocinar, hacer el mercado de la semana, o solo se te antoja algo rico?" },
   ]);
 
-  useEffect(() => { setConsentimiento(leerConsentimiento()); }, []);
+  // Cargar estado inicial persistente
+  useEffect(() => {
+    setConsentimiento(leerConsentimiento());
+    const guardadoId = leerConversacionId();
+    if (guardadoId) {
+      setConversacionId(guardadoId);
+      // Restaurar conversación previa si existe
+      void obtenerConversacion(guardadoId).then((detalle) => {
+        if (detalle && detalle.mensajes.length > 0) {
+          setMensajes(detalle.mensajes.map((m) => ({
+            rol: m.rol,
+            texto: m.contenido,
+          })));
+        }
+      });
+    }
+  }, []);
+
   useEffect(() => { if (abierto && !leerConsentimiento()) setMostrarConsentimiento(true); }, [abierto]);
   useEffect(() => () => { if (temporizador.current) clearTimeout(temporizador.current); }, []);
+
+  // Cargar lista de conversaciones cuando se abre el panel
+  const cargarListaConversaciones = useCallback(async () => {
+    setCargandoHistorial(true);
+    try {
+      const items = await obtenerConversaciones(20);
+      setListaConversaciones(items);
+    } finally {
+      setCargandoHistorial(false);
+    }
+  }, []);
+
+  const iniciarNuevaConversacion = () => {
+    guardarConversacionId(null);
+    setConversacionId(null);
+    setMensajes([
+      { rol: "asistente", texto: "¡Hola de nuevo! Iniciamos una nueva conversación 🛒✨\n\n¿En qué te puedo asesorar hoy?" },
+    ]);
+    setPanelHistorialAbierto(false);
+    mostrarAviso("Nueva conversación iniciada.");
+  };
+
+  const seleccionarConversacion = async (id: string) => {
+    setCargando(true);
+    try {
+      const detalle = await obtenerConversacion(id);
+      if (detalle && detalle.mensajes.length > 0) {
+        setConversacionId(id);
+        guardarConversacionId(id);
+        setMensajes(detalle.mensajes.map((m) => ({
+          rol: m.rol,
+          texto: m.contenido,
+        })));
+        setPanelHistorialAbierto(false);
+        mostrarAviso("Conversación restaurada.");
+      }
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  const borrarConversacionItem = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    const ok = await eliminarConversacion(id);
+    if (ok) {
+      setListaConversaciones((prev) => prev.filter((c) => c.id !== id));
+      if (conversacionId === id) {
+        iniciarNuevaConversacion();
+      }
+      mostrarAviso("Conversación eliminada.");
+    }
+  };
 
   function agregarDesdeChat(p: Producto, clave: string) {
     if (sedeId === null) { mostrarAviso("Elige una sede para agregar productos desde el chat."); return; }
@@ -279,8 +384,13 @@ export default function ChatAgente({ sedeId, onAgregar }: Props) {
     setMensajes((m) => [...m, { rol: "usuario", texto }]);
     setCargando(true);
     try {
-      const response = await chatear(texto, sedeId);
-      const { respuesta, productos, receta, presupuesto, comparacion, cart_actions } = response;
+      const response = await chatear(texto, sedeId, conversacionId);
+      const { respuesta, productos, receta, presupuesto, comparacion, cart_actions, conversacion_id: resCid } = response;
+
+      if (resCid && resCid !== conversacionId) {
+        setConversacionId(resCid);
+        guardarConversacionId(resCid);
+      }
 
       // Ejecutar acciones de carrito si las hay y obtener resultados reales
       let resultadosCarrito: string[] = [];
@@ -311,6 +421,7 @@ export default function ChatAgente({ sedeId, onAgregar }: Props) {
       setMensajes((m) => [...m, { rol: "asistente", texto: "No me pude conectar con el servidor. Intenta de nuevo." }]);
     } finally { setCargando(false); }
   }
+
 
   // Confirmar vaciado de carrito
   function confirmarVaciarCarrito(confirmado: boolean) {
@@ -835,12 +946,90 @@ export default function ChatAgente({ sedeId, onAgregar }: Props) {
           )}
 
           <div className="flex items-center justify-between bg-brand-red px-4 py-3 text-white">
-            <span className="font-black flex items-center gap-2">🤖 <span>Aya</span></span>
+            <div className="flex items-center gap-2">
+              <span className="font-black flex items-center gap-2">🤖 <span>Aya</span></span>
+              {user && (
+                <button
+                  onClick={() => {
+                    setPanelHistorialAbierto(v => !v);
+                    if (!panelHistorialAbierto) void cargarListaConversaciones();
+                  }}
+                  className="ml-2 rounded-lg bg-black/20 hover:bg-black/40 px-2 py-0.5 text-xs font-bold transition flex items-center gap-1 border border-white/20"
+                  title="Ver conversaciones anteriores"
+                >
+                  🕒 Chats
+                </button>
+              )}
+              <button
+                onClick={iniciarNuevaConversacion}
+                className="rounded-lg bg-black/20 hover:bg-black/40 px-2 py-0.5 text-xs font-bold transition flex items-center gap-1 border border-white/20"
+                title="Iniciar nueva conversación"
+              >
+                ➕ Nuevo
+              </button>
+            </div>
             <button onClick={() => setAbierto(false)} aria-label="Cerrar" className="text-xl leading-none">×</button>
           </div>
 
-          <div className="bg-brand-yellow px-3 py-1 text-[11px] font-medium text-brand-dark">
-            Tu asistente personal de compras y cocina • Powered by Ollama + pgvector
+          {/* Panel Desplegable de Conversaciones Guardadas (Neo-Pop) */}
+          {panelHistorialAbierto && (
+            <div className="border-b-2 border-brand-purple bg-white p-3 max-h-56 overflow-y-auto space-y-2 shadow-inner">
+              <div className="flex items-center justify-between text-xs font-black text-brand-purple uppercase tracking-wider">
+                <span>Tus conversaciones guardadas</span>
+                <button
+                  onClick={() => setPanelHistorialAbierto(false)}
+                  className="text-gray-500 hover:text-black font-bold"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {cargandoHistorial ? (
+                <p className="text-xs text-gray-500 py-2">Cargando tus conversaciones...</p>
+              ) : listaConversaciones.length === 0 ? (
+                <p className="text-xs text-gray-500 py-2">No tienes conversaciones previas guardadas.</p>
+              ) : (
+                listaConversaciones.map((conv) => {
+                  const activa = conv.id === conversacionId;
+                  return (
+                    <div
+                      key={conv.id}
+                      onClick={() => void seleccionarConversacion(conv.id)}
+                      className={`cursor-pointer rounded-xl border-2 p-2 text-xs transition flex items-center justify-between gap-2 shadow-[2px_2px_0_0_#3f0791] ${
+                        activa
+                          ? "border-[#e30ba6] bg-pink-50"
+                          : "border-gray-200 bg-white hover:border-brand-purple hover:bg-purple-50"
+                      }`}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-bold text-brand-dark">
+                          {conv.resumen}
+                        </p>
+                        <p className="text-[10px] text-gray-500">
+                          {conv.mensaje_count} mensajes • {new Date(conv.actualizada_en).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <button
+                        onClick={(e) => void borrarConversacionItem(e, conv.id)}
+                        className="text-gray-400 hover:text-brand-red p-1 text-sm font-bold"
+                        title="Eliminar conversación"
+                      >
+                        🗑
+                      </button>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
+
+          <div className="bg-brand-yellow px-3 py-1 text-[11px] font-medium text-brand-dark flex items-center justify-between">
+            <span>Tu asistente de compras en Neiva • Memoria persistente</span>
+            {conversacionId && (
+              <span className="text-[9px] bg-white/70 px-1.5 py-0.5 rounded font-mono text-black">
+                ID: {conversacionId.slice(0, 8)}
+              </span>
+            )}
           </div>
 
           <div className="flex-1 space-y-3 overflow-y-auto bg-brand-bg p-3">

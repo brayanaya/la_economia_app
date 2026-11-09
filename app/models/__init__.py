@@ -22,7 +22,11 @@ __all__ = [
     "TransaccionSiigo",
     "Orden",
     "DetalleOrden",
+    "Conversacion",
+    "Mensaje",
+    "TipoRemitente",
 ]
 
 from app.pagos.models import Pago  # noqa: F401
 from app.auth.models import Customer, CustomerSession  # noqa: F401
+from app.models.conversacion import Conversacion, Mensaje, TipoRemitente  # noqa: F401

@@ -242,7 +242,28 @@ async function post(path: string, body: unknown): Promise<unknown> {
   const res = await fetch(`${BASE}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+async function get(path: string): Promise<unknown> {
+  const res = await fetch(`${BASE}${path}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+async function del(path: string): Promise<unknown> {
+  const res = await fetch(`${BASE}${path}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
@@ -253,9 +274,33 @@ export async function buscarSemantica(consulta: string, sedeId: string | null, t
   return extraerLista(data).map(normalizarProducto);
 }
 
+export type ConversacionItem = {
+  id: string;
+  resumen: string;
+  mensaje_count: number;
+  creada_en: string;
+  actualizada_en: string;
+  receta_actual?: string | null;
+};
+
+export type ConversacionDetalle = {
+  id: string;
+  resumen?: string | null;
+  mensajes: {
+    rol: "usuario" | "asistente";
+    contenido: string;
+    timestamp: string;
+  }[];
+  receta_actual?: string | null;
+  productos_recientes?: string[];
+  creada_en: string;
+  actualizada_en: string;
+};
+
 export async function chatear(
   mensaje: string,
-  sedeId: string | null
+  sedeId: string | null,
+  conversacionId?: string | null
 ): Promise<{
   respuesta: string;
   productos: Producto[];
@@ -263,14 +308,20 @@ export async function chatear(
   presupuesto?: Presupuesto;
   comparacion?: Comparacion;
   cart_actions?: CartAction[];
+  conversacion_id?: string;
 }> {
-  const data = (await post("/agente/chat", { mensaje, sede_id: sedeId })) as Raw;
+  const data = (await post("/agente/chat", {
+    mensaje,
+    sede_id: sedeId,
+    conversacion_id: conversacionId || undefined,
+  })) as Raw;
   const respuesta = String(data.respuesta ?? data.response ?? data.message ?? "No pude generar una respuesta.");
   const productos = extraerLista({ productos: data.productos_recomendados }).map(normalizarProducto);
   const receta = data.receta ? (data.receta as Raw) : undefined;
   const presupuesto = data.presupuesto ? (data.presupuesto as Raw) : undefined;
   const comparacion = data.comparacion ? (data.comparacion as Raw) : undefined;
   const cart_actions = data.cart_actions ? (data.cart_actions as Raw[]) : undefined;
+  const resConversacionId = data.conversacion_id ? String(data.conversacion_id) : undefined;
   return {
     respuesta,
     productos,
@@ -278,8 +329,37 @@ export async function chatear(
     presupuesto: presupuesto ? normalizarPresupuesto(presupuesto) : undefined,
     comparacion: comparacion ? normalizarComparacion(comparacion) : undefined,
     cart_actions: cart_actions ? cart_actions.map(normalizarCartAction) : undefined,
+    conversacion_id: resConversacionId,
   };
 }
+
+export async function obtenerConversaciones(limite = 20): Promise<ConversacionItem[]> {
+  try {
+    const res = await get(`/agente/conversaciones?limite=${limite}`);
+    return Array.isArray(res) ? (res as ConversacionItem[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export async function obtenerConversacion(conversacionId: string): Promise<ConversacionDetalle | null> {
+  try {
+    const res = (await get(`/agente/conversacion/${conversacionId}`)) as ConversacionDetalle;
+    return res;
+  } catch {
+    return null;
+  }
+}
+
+export async function eliminarConversacion(conversacionId: string): Promise<boolean> {
+  try {
+    await del(`/agente/conversacion/${conversacionId}`);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 
 function normalizarReceta(raw: Raw): Receta {
   return {
@@ -449,20 +529,12 @@ export async function registrarConsentimiento(
   }
 }
 
-async function get(path: string): Promise<unknown> {
-  const res = await fetch(`${BASE}${path}`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
-}
-
 export async function obtenerEstadisticasAdmin(
   periodoDias = 30
 ): Promise<EstadisticasAdmin> {
   return (await get(`/admin/estadisticas?periodo_dias=${periodoDias}`)) as EstadisticasAdmin;
 }
+
 
 export async function obtenerOrdenesRecientes(
   limite = 10

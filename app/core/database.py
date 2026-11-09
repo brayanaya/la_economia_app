@@ -1,4 +1,4 @@
-﻿import sys
+import sys
 import asyncio
 
 if sys.platform == "win32":
@@ -14,12 +14,13 @@ class Base(DeclarativeBase):
     pass
 
 
+from sqlalchemy.pool import NullPool
+
 engine = create_async_engine(
     settings.database_url,
     echo=False,
     future=True,
-    pool_pre_ping=True,
-    pool_recycle=300,
+    poolclass=NullPool,
 )
 AsyncSessionLocal = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 

@@ -1,12 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional, List
 import uuid
 from decimal import Decimal
+from datetime import datetime, timezone
 
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.catalog_state import catalogo_state, get_catalogo_state
+from app.auth.models import Customer, CustomerSession
+from app.auth.router import digest
 from app.schemas.agente import (
     AgenteChatRequest,
     AgenteChatResponse,
@@ -48,6 +51,30 @@ from app.services.conversation import (
 router = APIRouter()
 
 
+async def get_optional_current_user(
+    request: Request,
+    db: AsyncSession = Depends(get_db)
+) -> Optional[Customer]:
+    """Obtiene el usuario actual si la cookie de sesión es válida, sino retorna None."""
+    raw = request.cookies.get(settings.auth_cookie_name)
+    if not raw:
+        return None
+    try:
+        from sqlalchemy import select
+        result = await db.execute(
+            select(CustomerSession).where(
+                CustomerSession.token_hash == digest(raw),
+                CustomerSession.expires_at > datetime.now(timezone.utc),
+            )
+        )
+        session = result.scalar_one_or_none()
+        if not session:
+            return None
+        return await db.get(Customer, session.user_id)
+    except Exception:
+        return None
+
+
 @router.post(
     "/chat",
     response_model=AgenteChatResponse,
@@ -60,6 +87,7 @@ async def agente_chat(
     registry = Depends(get_proveedor_registry),
     catalog_state = Depends(get_catalogo_state),
     memory = Depends(get_conversation_memory),
+    current_customer: Optional[Customer] = Depends(get_optional_current_user),
 ) -> AgenteChatResponse:
     """
     Flujo completo de Aya con Provider Pattern y Memoria Conversacional:
@@ -79,11 +107,10 @@ async def agente_chat(
         # Generar nuevo ID si no viene del frontend
         conversacion_id = str(uuid.uuid4())
 
-    # Obtener usuario_id si está autenticado (opcional)
-    usuario_id = None
-    # TODO: Obtener del auth context si hay sesión
+    # Obtener usuario_id si está autenticado
+    usuario_id = str(current_customer.id) if current_customer else None
 
-    contexto = memory.obtener_o_crear(conversacion_id, usuario_id)
+    contexto = await memory.obtener_o_crear(conversacion_id, usuario_id)
 
     # 2. Detectar intención de receta ANTES de buscar productos
     receta_id = detectar_intencion_receta(payload.mensaje)
@@ -489,7 +516,7 @@ async def agente_chat(
 
     contexto.agregar_mensaje(mensaje_usuario)
     contexto.agregar_mensaje(mensaje_asistente)
-    memory.guardar(contexto)
+    await memory.guardar(contexto)
 
     # 8. Construir respuesta con estado de catálogo
     from app.schemas.agente import CatalogoEstadoResponse
@@ -1174,9 +1201,71 @@ async def estado_catalogo(
 async def eliminar_conversacion(
     conversacion_id: str,
     memory = Depends(get_conversation_memory),
+    current_customer: Optional[Customer] = Depends(get_optional_current_user),
 ):
     """Elimina el historial de una conversación."""
-    eliminado = memory.eliminar(conversacion_id)
+    usuario_id = str(current_customer.id) if current_customer else None
+    eliminado = await memory.eliminar(conversacion_id, usuario_id)
     if not eliminado:
         raise HTTPException(404, "Conversación no encontrada")
     return {"ok": True, "mensaje": "Conversación eliminada"}
+
+
+@router.get(
+    "/conversaciones",
+    summary="Lista las conversaciones del usuario autenticado"
+)
+async def listar_conversaciones(
+    memory = Depends(get_conversation_memory),
+    current_customer: Optional[Customer] = Depends(get_optional_current_user),
+    limite: int = 20,
+):
+    """Retorna lista de conversaciones activas del usuario autenticado."""
+    if not current_customer:
+        return []
+    usuario_id = str(current_customer.id)
+    conversaciones = await memory.obtener_todas_usuario(usuario_id, limite=limite)
+    return [
+        {
+            "id": c.conversacion_id,
+            "resumen": c.resumen or (c.mensajes[0].contenido[:60] + "..." if c.mensajes else "Conversación"),
+            "mensaje_count": c.mensaje_count,
+            "creada_en": c.creada_en.isoformat(),
+            "actualizada_en": c.actualizada_en.isoformat(),
+            "receta_actual": c.receta_actual,
+        }
+        for c in conversaciones
+    ]
+
+
+@router.get(
+    "/conversacion/{conversacion_id}",
+    summary="Obtiene el historial y contexto de una conversación"
+)
+async def obtener_conversacion(
+    conversacion_id: str,
+    memory = Depends(get_conversation_memory),
+    current_customer: Optional[Customer] = Depends(get_optional_current_user),
+):
+    """Retorna mensajes y metadatos de una conversación."""
+    usuario_id = str(current_customer.id) if current_customer else None
+    try:
+        ctx = await memory.obtener_o_crear(conversacion_id, usuario_id)
+        return {
+            "id": ctx.conversacion_id,
+            "resumen": ctx.resumen,
+            "mensajes": [
+                {
+                    "rol": m.rol.value,
+                    "contenido": m.contenido,
+                    "timestamp": m.timestamp.isoformat(),
+                }
+                for m in ctx.mensajes
+            ],
+            "receta_actual": ctx.receta_actual,
+            "productos_recientes": ctx.productos_recientes,
+            "creada_en": ctx.creada_en.isoformat(),
+            "actualizada_en": ctx.actualizada_en.isoformat(),
+        }
+    except Exception:
+        raise HTTPException(404, "Conversación no encontrada")

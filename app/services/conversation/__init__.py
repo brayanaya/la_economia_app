@@ -6,7 +6,6 @@ from app.services.conversation.memory import (
     ContextoConversacion,
     MensajeConversacion,
     RolMensaje,
-    conversation_memory,
     get_conversation_memory,
 )
 
@@ -15,6 +14,5 @@ __all__ = [
     "ContextoConversacion",
     "MensajeConversacion",
     "RolMensaje",
-    "conversation_memory",
     "get_conversation_memory",
 ]
